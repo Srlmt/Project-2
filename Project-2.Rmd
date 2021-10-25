@@ -86,7 +86,7 @@ After viewing the boxplot above, you should be able to determine what day (or da
 
 We can further see evidence of this by examining the categorical variable `is_weekend`:
 
-```{r JOhn EDA2}
+```{r John EDA2}
 ggplot(world_news_data, aes(x = as.factor(is_weekend), y = log(shares))) +
   geom_boxplot(aes(fill = as.factor(is_weekend))) +
   theme(legend.position = "none") +
@@ -201,8 +201,42 @@ corrplot(cormatrix, type = "upper", order = "hclust",
 
 ## Linear Model #2
 
+```{r John Linear Model}
+# Remove variables with colinearity
+reduced_world_news_data <- world_news_data %>%
+                           select(n_tokens_title,
+                                  n_tokens_content,
+                                  num_hrefs,
+                                  num_imgs,
+                                  num_videos,
+                                  num_keywords,
+                                  average_token_length,
+                                  is_weekend,
+                                  global_subjectivity,
+                                  global_sentiment_polarity,
+                                  title_sentiment_polarity,
+                                  self_reference_avg_sharess,
+                                  rate_positive_words,
+                                  shares)
+
+lmod <- lm(shares ~ . + n_tokens_title:average_token_length +
+                        n_tokens_title:global_sentiment_polarity +
+                        n_tokens_title:rate_positive_words +
+                        n_tokens_content:num_imgs +
+                        num_imgs:num_keywords +
+                        num_imgs:global_subjectivity +
+                        num_imgs:global_sentiment_polarity, 
+           data = reduced_world_news_data)
+
+summary(lmod)
+```
+
 ## Random Forest Model
 
 ## Boosted Tree Model
+
+```{r}
+
+```
 
 
