@@ -66,7 +66,7 @@ Since the range of the response variable `shares` is quite broad, spanning from 
 
 Let's create a categorical variable `day_published` and determine if the mean/median number of shares changes depending on what day the article was published: 
 
-```{r EDA1}
+```{r John EDA1}
 world_news_data2 <- world_news_data %>%
                     pivot_longer(starts_with("weekday"), 
                                  names_to = "day_published",
@@ -86,7 +86,7 @@ After viewing the boxplot above, you should be able to determine what day (or da
 
 We can further see evidence of this by examining the categorical variable `is_weekend`:
 
-```{r EDA2}
+```{r JOhn EDA2}
 ggplot(world_news_data, aes(x = as.factor(is_weekend), y = log(shares))) +
   geom_boxplot(aes(fill = as.factor(is_weekend))) +
   theme(legend.position = "none") +
@@ -98,39 +98,63 @@ ggplot(world_news_data, aes(x = as.factor(is_weekend), y = log(shares))) +
 
 Let's examine the relationship between a continuous variable that is within the range [0, 1] and `log(shares)`. One way we can do this by "cutting" the variable into 11 subintervals ((-0.5, 0.5], (0.5, 1.5], (1.5, 2.5], etc.) and calculating the mean/median `log(shares)` for each subinterval. If the mean/median of `log(shares)` steadily increases as the predictor increases, then there is a positive relationship; if the mean/median of `log(shares)` steadily decreases as the predictor increases, then there is a negative relationship. If there is no clear pattern in the mean/median of `log(shares)` as the predictor increases, then we cannot make any statement about the linear relationship of that predictor and the response. For example, `title_subjectivity` has a range [0, 1]. Let's see how the mean/median of `log(shares)` changes as `title_subjectivity` increases:
 
-```{r EDA3}
-world_news_data %>%
-  mutate(title_subjectivity = cut(title_subjectivity, 
-                                  seq(-0.05, 1.05, by = 0.1))) %>%
-  group_by(title_subjectivity) %>%
-  summarise(mean = mean(log(shares)), median = median(log(shares)), n = n())
+```{r John EDA3}
+tab <- world_news_data %>%
+       mutate(title_subjectivity = cut(title_subjectivity, 
+                                       seq(-0.05, 1.05, by = 0.1))) %>%
+       group_by(title_subjectivity) %>%
+       summarise(mean = mean(log(shares)), 
+                 median = median(log(shares)), 
+                 n = n())
+
+knitr::kable(tab, 
+             digits = 3,
+             format.args = list(big.mark = ",", scientific = FALSE),
+             col.names = c('Title Subjectivity', 'Mean', 'Median', 'Count'),
+             caption = "Summary of Title Subjectivity")
 ```
 
 Similarly, we can examine `rate_negative_words`:
 
-```{r EDA4}
-world_news_data %>%
-  mutate(rate_negative_words = cut(rate_negative_words, 
-                                   seq(-0.05, 1.05, by = 0.1))) %>%
-  group_by(rate_negative_words) %>%
-  summarise(mean = mean(log(shares)), median = median(log(shares)), n = n())
+```{r JOhn EDA4}
+tab <- world_news_data %>%
+       mutate(rate_negative_words = cut(rate_negative_words, 
+                                        seq(-0.05, 1.05, by = 0.1))) %>%
+       group_by(rate_negative_words) %>%
+       summarise(mean = mean(log(shares)), 
+                 median = median(log(shares)), 
+                 n = n())
+
+knitr::kable(tab, 
+             digits = 3,
+             format.args = list(big.mark = ",", scientific = FALSE),
+             col.names = c('Rate Negative Words', 'Mean', 'Median', 'Count'),
+             caption = "Summary of Rate Negative Words")
 ```
 
 And `avg_positive_polarity`:
 
-```{r EDA5}
-world_news_data %>%
-  mutate(avg_positive_polarity = cut(avg_positive_polarity, 
-                                     seq(0, 1, by = 0.1), right = FALSE)) %>%
-  group_by(avg_positive_polarity) %>%
-  summarise(mean = mean(log(shares)), median = median(log(shares)), n = n())
+```{r John EDA5}
+tab <- world_news_data %>%
+       mutate(avg_positive_polarity = cut(avg_positive_polarity, 
+                                          seq(0, 1, by = 0.1), right = F)) %>%
+       group_by(avg_positive_polarity) %>%
+       summarise(mean = mean(log(shares)), 
+                 median = median(log(shares)), 
+                 n = n())
+
+knitr::kable(tab, 
+             digits = 3,
+             format.args = list(big.mark = ",", scientific = FALSE),
+             col.names = c('Avg Positive Polarity', 'Mean', 'Median', 'Count'),
+             caption = "Summary of Average Positive Polarity")
 ```
 
 ## Log(shares) by Number of Keywords
 
 Is the number of keywords influential in determining the number of shares? Let's transform `num_keywords` into a categorical variable and create a boxplot. The boxplot will show us if any particular number of keywords is related to higher number of shares.
 
-```{r EDA6}
+```{r John EDA6}
 ggplot(world_news_data, aes(x = as.factor(num_keywords), y = log(shares))) +
   geom_boxplot(aes(fill=as.factor(num_keywords))) +
   stat_summary(fun.y = "mean") +
@@ -143,7 +167,7 @@ ggplot(world_news_data, aes(x = as.factor(num_keywords), y = log(shares))) +
 
 Now, before creating our prediction models, we need to examine the correlation among predictors, as we would not want to include predictors in the model that are highly correlated. Since we have a large number of predictors, let's attempt to subset the predictors based on measuring similar attributes.
 
-```{r EDA7}
+```{r John EDA7}
 # Create a correlogram for predictors that measure attributes of "tokens" 
 # and "words"
 cor1 <- world_news_data %>% select(contains("tokens"), contains("words"))
@@ -170,6 +194,4 @@ cormatrix <- round(cor(cor4), 2)
 corrplot(cormatrix, type = "upper", order = "hclust", 
          tl.col = "black", tl.srt = 45)
 ```
-
-
 
