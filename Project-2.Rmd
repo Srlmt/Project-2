@@ -195,3 +195,14 @@ corrplot(cormatrix, type = "upper", order = "hclust",
          tl.col = "black", tl.srt = 45)
 ```
 
+# Modeling
+
+## Linear Model #1
+
+## Linear Model #2
+
+## Random Forest Model
+
+## Boosted Tree Model
+
+
