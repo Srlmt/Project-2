@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 # necessary packages
 library(tidyverse)
 library(corrplot)
+library(caret)
 ```
 
 
@@ -197,12 +198,22 @@ corrplot(cormatrix, type = "upper", order = "hclust",
 
 # Modeling
 
+```{r Partitioning of Train and Test Data}
+set.seed(31415)
+
+partition <- createDataPartition(y = world_news_data$shares, 
+                                 p= 0.7, 
+                                 list = FALSE)
+world_news_train <- world_news_data[partition,]
+world_news_test <- world_news_data[-partition,]
+```
+
 ## Linear Model #1
 
 ## Linear Model #2
 
 ```{r John Linear Model}
-# Remove variables with colinearity
+# Remove variables with possible colinearity
 reduced_world_news_data <- world_news_data %>%
                            select(n_tokens_title,
                                   n_tokens_content,
@@ -236,7 +247,18 @@ summary(lmod)
 ## Boosted Tree Model
 
 ```{r}
-
+#control <- trainControl(method = "repeatedcv", number = 5, repeats = 3)
+#boostedFit <- train(HeartDisease ~ ., data = heartTrain, 
+#                    method = "gbm",
+#                    trControl = control,
+#                    preProcess = c("center", "scale"),
+#                    tuneGrid = expand.grid(n.trees = c(25, 50, 100, 150, 200),
+#                                           interaction.depth = c(1:4),
+#                                           shrinkage = 0.1,
+#                                           n.minobsinnode = 10))
+#
+#boostedFitPredict <- predict(boostedFit, newdata = heartTest)
+#confusionMatrix(boostedFitPredict, heartTest$HeartDisease )
 ```
 
 
