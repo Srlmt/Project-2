@@ -14,9 +14,6 @@ library(corrplot)
 
 
 ```{r data}
-# set working directory
-setwd("C:/ST558/Project2/")
-
 # read data
 news_data <- read_csv("./OnlineNewsPopularity.csv")
 
@@ -30,7 +27,40 @@ world_news_data <- news_data %>%
                    select(-url, -timedelta)
 ```
 
-## Exploratory Data Analysis
+# Exploratory Data Analysis
+
+## Distribution of Response Variable
+
+First, we can take a look at the distribution of our response variable `shares`. We can first look at the histogram. 
+
+```{r EDA shares Joey}
+# Histogram of shares
+ggplot(world_news_data, aes(x=shares)) +
+  geom_histogram(bins=50) +
+  labs(title="Histogram of shares")
+```
+
+From the histogram We can see that the distribution is heavily right skewed. The histogram scale may be influenced by potential outliers, so we can look at the distribution of `shares` under 10,000. 
+
+```{r EDA shares le 5000 Joey}
+# Histogram of shares < 5000
+ggplot(filter(world_news_data, shares < 5000), aes(x=shares)) +
+  geom_histogram(bins=50) +
+  labs(title="Histogram of shares under 5000")
+```
+  
+As we can see, the distribution is still heavily right skewed. So we may want to look at the distribution of `log(shares)`.
+  
+```{r EDA log shares Joey}
+# Histogram of log(shares) 
+ggplot(world_news_data, aes(x=log(shares))) +
+  geom_histogram(bins=50) +
+  labs(title="Histogram of log(shares)")
+```
+  
+From the histogram we can see that the distribution is slightly right skewed. But it is much closer to normal compared to the original distribution.  
+
+## Log(shares) by Day of Week
 
 Since the range of the response variable `shares` is quite broad, spanning from 1 to 843,300, we will use `log(shares)` to make the data easier to view.
 
@@ -64,6 +94,8 @@ ggplot(world_news_data, aes(x = as.factor(is_weekend), y = log(shares))) +
        title = "Log(Shares) by Day of Publication")
 ```
 
+## Summary by Interval
+
 Let's examine the relationship between a continuous variable that is within the range [0, 1] and `log(shares)`. One way we can do this by "cutting" the variable into 11 subintervals ((-0.5, 0.5], (0.5, 1.5], (1.5, 2.5], etc.) and calculating the mean/median `log(shares)` for each subinterval. If the mean/median of `log(shares)` steadily increases as the predictor increases, then there is a positive relationship; if the mean/median of `log(shares)` steadily decreases as the predictor increases, then there is a negative relationship. If there is no clear pattern in the mean/median of `log(shares)` as the predictor increases, then we cannot make any statement about the linear relationship of that predictor and the response. For example, `title_subjectivity` has a range [0, 1]. Let's see how the mean/median of `log(shares)` changes as `title_subjectivity` increases:
 
 ```{r EDA3}
@@ -94,6 +126,8 @@ world_news_data %>%
   summarise(mean = mean(log(shares)), median = median(log(shares)), n = n())
 ```
 
+## Log(shares) by Number of Keywords
+
 Is the number of keywords influential in determining the number of shares? Let's transform `num_keywords` into a categorical variable and create a boxplot. The boxplot will show us if any particular number of keywords is related to higher number of shares.
 
 ```{r EDA6}
@@ -104,6 +138,8 @@ ggplot(world_news_data, aes(x = as.factor(num_keywords), y = log(shares))) +
   labs(x = "Number of Keywords", 
        title = "Log(Shares) by Number of Keywords")
 ```
+
+## Correlation
 
 Now, before creating our prediction models, we need to examine the correlation among predictors, as we would not want to include predictors in the model that are highly correlated. Since we have a large number of predictors, let's attempt to subset the predictors based on measuring similar attributes.
 
