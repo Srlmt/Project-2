@@ -1,0 +1,18 @@
+---
+title: "renderProject"
+author: "Joey Chen and John Williams"
+date: "10/24/2021"
+---
+
+```{r}
+# Description: This program renders Project-2 and outputs the documents
+
+rmarkdown::render("Project-2.Rmd", 
+                  output_format = "github_document", 
+                  output_file = "WorldAnalysis.md",
+                  output_options = list(
+                    html_preview = FALSE,
+                    toc = TRUE,
+                    toc_depth = 2
+                  ))
+```
