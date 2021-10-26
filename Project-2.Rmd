@@ -11,9 +11,14 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 library(tidyverse)
 library(corrplot)
 library(caret)
+library(modelr)
 ```
 
+# Introduction
 
+...Placeholder for introduction...
+
+# Data Preparation
 ```{r data}
 # read data
 news_data <- read_csv("./OnlineNewsPopularity.csv")
@@ -34,7 +39,7 @@ world_news_data <- news_data %>%
 
 First, we can take a look at the distribution of our response variable `shares`. We can first look at the histogram. 
 
-```{r EDA shares Joey}
+```{r Joey EDA shares}
 # Histogram of shares
 ggplot(world_news_data, aes(x=shares)) +
   geom_histogram(bins=50) +
@@ -43,7 +48,7 @@ ggplot(world_news_data, aes(x=shares)) +
 
 From the histogram We can see that the distribution is heavily right skewed. The histogram scale may be influenced by potential outliers, so we can look at the distribution of `shares` under 10,000. 
 
-```{r EDA shares le 5000 Joey}
+```{r Joey EDA shares le 5000}
 # Histogram of shares < 5000
 ggplot(filter(world_news_data, shares < 5000), aes(x=shares)) +
   geom_histogram(bins=50) +
@@ -52,14 +57,41 @@ ggplot(filter(world_news_data, shares < 5000), aes(x=shares)) +
   
 As we can see, the distribution is still heavily right skewed. So we may want to look at the distribution of `log(shares)`.
   
-```{r EDA log shares Joey}
+```{r Joey EDA log shares}
 # Histogram of log(shares) 
 ggplot(world_news_data, aes(x=log(shares))) +
   geom_histogram(bins=50) +
   labs(title="Histogram of log(shares)")
 ```
-  
+
 From the histogram we can see that the distribution is slightly right skewed. But it is much closer to normal compared to the original distribution.  
+  
+  
+We can also look at the numeric summary of shares vs log(shares).
+
+```{r Joey EDA log shares summary}
+# Numeric summary of shares
+shares_summary <- world_news_data %>% summarise(Min. = min(shares),
+                                                Q1 = quantile(shares, 0.25),
+                                                Median = median(shares),
+                                                Mean = mean(shares),
+                                                SD = sd(shares),
+                                                Q3 = quantile(shares, 0.75),
+                                                Max = max(shares))
+
+kable(shares_summary, digits=0, caption = "Numeric Summary of Shares")
+
+# Numeric summary of log(shares)
+log_shares_summary <- world_news_data %>% summarise(Min. = min(log(shares)),
+                                                Q1 = quantile(log(shares), 0.25),
+                                                Median = median(log(shares)),
+                                                Mean = mean(log(shares)),
+                                                SD = sd(log(shares)),
+                                                Q3 = quantile(log(shares), 0.75),
+                                                Max = max(log(shares)))
+
+kable(log_shares_summary, digits=3, caption="Numeric Summary of log(Shares)")
+```
 
 ## Log(shares) by Day of Week
 
@@ -163,8 +195,25 @@ ggplot(world_news_data, aes(x = as.factor(num_keywords), y = log(shares))) +
   labs(x = "Number of Keywords", 
        title = "Log(Shares) by Number of Keywords")
 ```
+  
+## Log(shares) by Number of Images and Videos
 
-## Correlation
+```{r Joey EDA img video}
+# Scatterplot of num_img and log(shares)
+ggplot(world_news_data, aes(x = num_imgs, y = log(shares))) +
+  geom_point() + 
+  geom_smooth(method="lm")
+
+# Scatterplot of num_videos and log(shares)
+ggplot(world_news_data, aes(x = num_videos, y = log(shares))) +
+  geom_point() + 
+  geom_smooth(method="lm")
+
+
+```
+
+
+## Correlation of Predictors
 
 Now, before creating our prediction models, we need to examine the correlation among predictors, as we would not want to include predictors in the model that are highly correlated. Since we have a large number of predictors, let's attempt to subset the predictors based on measuring similar attributes.
 
@@ -208,7 +257,46 @@ world_news_train <- world_news_data[partition,]
 world_news_test <- world_news_data[-partition,]
 ```
 
+...Placeholder for description of Linear model...
+
 ## Linear Model #1
+```{r Joey Linear Model 1}
+lm1Fit <- lm(log(shares) ~ n_tokens_title +
+                     n_non_stop_words + 
+                     num_hrefs +
+                     num_imgs + 
+                     num_videos +
+                     average_token_length + 
+                     kw_min_min +
+                     kw_min_avg +
+                     kw_max_avg +
+                     kw_avg_avg +
+                     self_reference_avg_sharess +
+                     weekday_is_monday +
+                     weekday_is_tuesday +
+                     weekday_is_wednesday +
+                     weekday_is_thursday +
+                     weekday_is_friday +
+                     LDA_00 +
+                     LDA_02 +
+                     global_subjectivity +
+                     title_sentiment_polarity +
+                     I(n_tokens_title^2) +
+                     I(num_videos^2) +
+                     I(average_token_length^2) + 
+                     I(kw_min_avg^2) +
+                     I(kw_avg_avg^2) +
+                     I(self_reference_avg_sharess^2) +
+                     I(title_sentiment_polarity^2) +
+                     num_hrefs:num_imgs +
+                     kw_min_min:weekday_is_tuesday +
+                     n_tokens_title:num_imgs,
+            data = world_news_train)
+
+summary(lm1Fit)
+
+rmse(lm1Fit, world_news_train)
+```
 
 ## Linear Model #2
 
@@ -243,6 +331,19 @@ summary(lmod)
 ```
 
 ## Random Forest Model
+```{r Joey random Forect}
+# Fit the random forest Model
+#rfFit <- train(log(shares) ~ .,
+#               data = world_news_train,
+#               method = "rf",
+#               trControl = trainControl(method = "repeatedcv",
+#                                        number = 5,
+#                                        repeats = 3),
+#               tuneGrid = data.frame(mtry = 1:15))
+
+#rmse(rfFit, world_news_train)
+```
+
 
 ## Boosted Tree Model
 
