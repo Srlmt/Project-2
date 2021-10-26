@@ -318,14 +318,14 @@ reduced_world_news_data <- world_news_data %>%
                                   rate_positive_words,
                                   shares)
 
-lmod <- lm(shares ~ . + n_tokens_title:average_token_length +
-                        n_tokens_title:global_sentiment_polarity +
-                        n_tokens_title:rate_positive_words +
-                        n_tokens_content:num_imgs +
-                        num_imgs:num_keywords +
-                        num_imgs:global_subjectivity +
-                        num_imgs:global_sentiment_polarity, 
-           data = reduced_world_news_data)
+lm2Fit <- lm(shares ~ . + n_tokens_title:average_token_length +
+                          n_tokens_title:global_sentiment_polarity +
+                          n_tokens_title:rate_positive_words +
+                          n_tokens_content:num_imgs +
+                          num_imgs:num_keywords +
+                          num_imgs:global_subjectivity +
+                          num_imgs:global_sentiment_polarity, 
+             data = reduced_world_news_data)
 
 summary(lmod)
 ```
@@ -347,19 +347,19 @@ summary(lmod)
 
 ## Boosted Tree Model
 
+...Placeholder for description of Boosted Tree Model...
+
 ```{r}
-#control <- trainControl(method = "repeatedcv", number = 5, repeats = 3)
-#boostedFit <- train(HeartDisease ~ ., data = heartTrain, 
-#                    method = "gbm",
-#                    trControl = control,
-#                    preProcess = c("center", "scale"),
-#                    tuneGrid = expand.grid(n.trees = c(25, 50, 100, 150, 200),
-#                                           interaction.depth = c(1:4),
-#                                           shrinkage = 0.1,
-#                                           n.minobsinnode = 10))
-#
-#boostedFitPredict <- predict(boostedFit, newdata = heartTest)
-#confusionMatrix(boostedFitPredict, heartTest$HeartDisease )
+control <- trainControl(method = "repeatedcv", number = 5, repeats = 3)
+boostedFit <- train(HeartDisease ~ ., data = heartTrain, 
+                    method = "gbm",
+                    trControl = control,
+                    preProcess = c("center", "scale"),
+                    tuneGrid = expand.grid(n.trees = c(25, 50, 100, 150, 200),
+                                           interaction.depth = c(1:4),
+                                           shrinkage = 0.1,
+                                           n.minobsinnode = 10),
+                    verbose = FALSE)
 ```
 
 
