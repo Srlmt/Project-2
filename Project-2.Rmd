@@ -318,13 +318,13 @@ reduced_world_news_data <- world_news_data %>%
                                   rate_positive_words,
                                   shares)
 
-lm2Fit <- lm(shares ~ . + n_tokens_title:average_token_length +
-                          n_tokens_title:global_sentiment_polarity +
-                          n_tokens_title:rate_positive_words +
-                          n_tokens_content:num_imgs +
-                          num_imgs:num_keywords +
-                          num_imgs:global_subjectivity +
-                          num_imgs:global_sentiment_polarity, 
+lm2Fit <- lm(log(shares) ~ . + n_tokens_title:average_token_length +
+                               n_tokens_title:global_sentiment_polarity +
+                               n_tokens_title:rate_positive_words +
+                               n_tokens_content:num_imgs +
+                               num_imgs:num_keywords +
+                               num_imgs:global_subjectivity +
+                               num_imgs:global_sentiment_polarity, 
              data = reduced_world_news_data)
 
 summary(lmod)
@@ -351,7 +351,7 @@ summary(lmod)
 
 ```{r}
 control <- trainControl(method = "cv", number = 5)
-boostedFit <- train(shares ~ ., data = world_news_train, 
+boostedFit <- train(log(shares) ~ ., data = world_news_train, 
                     method = "gbm",
                     trControl = control,
                     preProcess = c("center", "scale"),
@@ -366,13 +366,13 @@ boostedFit <- train(shares ~ ., data = world_news_train,
 
 ```{r}
 prediction <- predict(lm1Fit, newdata = world_news_test)
-lm1 <- round(postResample(prediction, world_news_test$shares), 3)
+lm1 <- round(postResample(prediction, log(world_news_test$shares)), 3)
 
 prediction <- predict(lm2Fit, newdata = world_news_test)
-lm2 <- round(postResample(prediction, world_news_test$shares), 3)
+lm2 <- round(postResample(prediction, log(world_news_test$shares)), 3)
 
 prediction <- predict(boostedFit, newdata = world_news_test)
-boost <- round(postResample(prediction, world_news_test$shares), 3)
+boost <- round(postResample(prediction, log(world_news_test$shares)), 3)
 
 compareFits <- data.frame(lm1, lm2, boost)
 names(compareFits) <- c("Linear Model 1", 
