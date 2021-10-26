@@ -350,8 +350,8 @@ summary(lmod)
 ...Placeholder for description of Boosted Tree Model...
 
 ```{r}
-control <- trainControl(method = "repeatedcv", number = 5, repeats = 3)
-boostedFit <- train(HeartDisease ~ ., data = heartTrain, 
+control <- trainControl(method = "cv", number = 5)
+boostedFit <- train(shares ~ ., data = world_news_train, 
                     method = "gbm",
                     trControl = control,
                     preProcess = c("center", "scale"),
@@ -362,4 +362,21 @@ boostedFit <- train(HeartDisease ~ ., data = heartTrain,
                     verbose = FALSE)
 ```
 
+## Comparison
 
+```{r}
+prediction <- predict(lm1Fit, newdata = world_news_test)
+lm1 <- round(postResample(prediction, world_news_test$shares), 3)
+
+prediction <- predict(lm2Fit, newdata = world_news_test)
+lm2 <- round(postResample(prediction, world_news_test$shares), 3)
+
+prediction <- predict(boostedFit, newdata = world_news_test)
+boost <- round(postResample(prediction, world_news_test$shares), 3)
+
+compareFits <- data.frame(lm1, lm2, boost)
+names(compareFits) <- c("Linear Model 1", 
+                        "Linear Model 2", 
+                        "Boosted Tree Model")
+t(compareFits)
+```
