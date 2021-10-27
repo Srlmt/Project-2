@@ -20,6 +20,7 @@ Joey Chen and John Williams
       - [Linear Model \#2](#linear-model-2)
       - [Random Forest Model](#random-forest-model)
       - [Boosted Tree Model](#boosted-tree-model)
+      - [Comparison](#comparison)
 
 # Introduction
 
@@ -86,7 +87,7 @@ From the histogram we can see that the distribution is slightly right
 skewed. But it is much closer to normal compared to the original
 distribution.
 
-We can also look at the numeric summary of shares vs log(shares).
+We can also look at the numeric summary of `shares` vs `log(shares)`.
 
 ``` r
 # Numeric summary of shares
@@ -98,7 +99,7 @@ shares_summary <- world_news_data %>% summarise(Min. = min(shares),
                                                 Q3 = quantile(shares, 0.75),
                                                 Max = max(shares))
 
-kable(shares_summary, digits=0, caption = "Numeric Summary of Shares")
+knitr::kable(shares_summary, digits=0, caption = "Numeric Summary of Shares")
 ```
 
 | Min. |  Q1 | Median | Mean |   SD |   Q3 |    Max |
@@ -117,7 +118,7 @@ log_shares_summary <- world_news_data %>% summarise(Min. = min(log(shares)),
                                                 Q3 = quantile(log(shares), 0.75),
                                                 Max = max(log(shares)))
 
-kable(log_shares_summary, digits=3, caption="Numeric Summary of log(Shares)")
+knitr::kable(log_shares_summary, digits=3, caption="Numeric Summary of log(Shares)")
 ```
 
 |  Min. |    Q1 | Median |  Mean |   SD |   Q3 |    Max |
@@ -126,11 +127,13 @@ kable(log_shares_summary, digits=3, caption="Numeric Summary of log(Shares)")
 
 Numeric Summary of log(Shares)
 
-## Log(shares) by Day of Week
+In addition to the histograms, we can see that the coefficient of
+variation (CV) is much larger in `shares` compared to `log(shares)`.
+This can make `shares` harder to predict. So we will continue to do EDA
+using `log(shares)` and will fit the models on `log(shares)` since that
+can also help reduce the impact of some extreme values of `shares`.
 
-Since the range of the response variable `shares` is quite broad,
-spanning from 1 to 843,300, we will use `log(shares)` to make the data
-easier to view.
+## Log(shares) by Day of Week
 
 Let’s create a categorical variable `day_published` and determine if the
 mean/median number of shares changes depending on what day the article
@@ -306,11 +309,18 @@ ggplot(world_news_data, aes(x = as.factor(num_keywords), y = log(shares))) +
 
 ## Log(shares) by Number of Images and Videos
 
+We can examine the impact of the number of videos and images on
+`log(shares)`. We can do this by looking at the scatterplots. If the
+points show an upward trend, then articles with more images or videos
+would be shared more often. If we see a negative trend then articles
+with more images or videos would be shared less often.
+
 ``` r
 # Scatterplot of num_img and log(shares)
 ggplot(world_news_data, aes(x = num_imgs, y = log(shares))) +
   geom_point() + 
-  geom_smooth(method="lm")
+  geom_smooth(method="lm") +
+  labs(title="Scatterplot of Number of Images vs log(shares)")
 ```
 
 ![](WorldAnalysis_files/figure-gfm/Joey%20EDA%20img%20video-1.png)<!-- -->
@@ -319,10 +329,30 @@ ggplot(world_news_data, aes(x = num_imgs, y = log(shares))) +
 # Scatterplot of num_videos and log(shares)
 ggplot(world_news_data, aes(x = num_videos, y = log(shares))) +
   geom_point() + 
-  geom_smooth(method="lm")
+  geom_smooth(method="lm") +
+  labs(title="Scatterplot of Number of Videos vs log(shares)")
 ```
 
 ![](WorldAnalysis_files/figure-gfm/Joey%20EDA%20img%20video-2.png)<!-- -->
+
+We can also examine the correlation coefficient (r) to observe the
+strength of the association. For absolute values of r, we can considered
+0-0.19 as very weak, 0.2-0.39 as weak, 0.4-0.59 as moderate, 0.6-0.79 as
+strong and 0.8-1 as very strong correlation.
+
+``` r
+# Correlation Coefficient (r) of num_imgs vs log(shares) 
+cor(x = world_news_data$num_imgs, y = log(world_news_data$shares))
+```
+
+    ## [1] 0.1304567
+
+``` r
+# Correlation Coefficient (r) of num_videos vs log(shares) 
+cor(x = world_news_data$num_videos, y = log(world_news_data$shares))
+```
+
+    ## [1] 0.06812929
 
 ## Correlation of Predictors
 
@@ -483,12 +513,6 @@ summary(lm1Fit)
     ## Multiple R-squared:  0.1195, Adjusted R-squared:  0.115 
     ## F-statistic: 26.55 on 30 and 5869 DF,  p-value: < 2.2e-16
 
-``` r
-rmse(lm1Fit, world_news_train)
-```
-
-    ## [1] 0.7760105
-
 ## Linear Model \#2
 
 ``` r
@@ -509,87 +533,143 @@ reduced_world_news_data <- world_news_data %>%
                                   rate_positive_words,
                                   shares)
 
-lmod <- lm(shares ~ . + n_tokens_title:average_token_length +
-                        n_tokens_title:global_sentiment_polarity +
-                        n_tokens_title:rate_positive_words +
-                        n_tokens_content:num_imgs +
-                        num_imgs:num_keywords +
-                        num_imgs:global_subjectivity +
-                        num_imgs:global_sentiment_polarity, 
-           data = reduced_world_news_data)
+lm2Fit <- lm(log(shares) ~ . + n_tokens_title:average_token_length +
+                               n_tokens_title:global_sentiment_polarity +
+                               n_tokens_title:rate_positive_words +
+                               n_tokens_content:num_imgs +
+                               num_imgs:num_keywords +
+                               num_imgs:global_subjectivity +
+                               num_imgs:global_sentiment_polarity, 
+             data = reduced_world_news_data)
 
-summary(lmod)
+summary(lm2Fit)
 ```
 
     ## 
     ## Call:
-    ## lm(formula = shares ~ . + n_tokens_title:average_token_length + 
+    ## lm(formula = log(shares) ~ . + n_tokens_title:average_token_length + 
     ##     n_tokens_title:global_sentiment_polarity + n_tokens_title:rate_positive_words + 
     ##     n_tokens_content:num_imgs + num_imgs:num_keywords + num_imgs:global_subjectivity + 
     ##     num_imgs:global_sentiment_polarity, data = reduced_world_news_data)
     ## 
     ## Residuals:
-    ##    Min     1Q Median     3Q    Max 
-    ## -11276  -1467   -804    -29 280308 
+    ##     Min      1Q  Median      3Q     Max 
+    ## -3.4816 -0.4624 -0.1442  0.3106  5.2739 
     ## 
     ## Coefficients:
     ##                                            Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)                               2.256e+03  1.931e+03   1.169 0.242538    
-    ## n_tokens_title                            1.389e+02  1.738e+02   0.799 0.424124    
-    ## n_tokens_content                         -5.662e-01  2.010e-01  -2.817 0.004862 ** 
-    ## num_hrefs                                 2.876e+01  8.067e+00   3.566 0.000365 ***
-    ## num_imgs                                 -2.176e+02  6.466e+01  -3.366 0.000766 ***
-    ## num_videos                                1.126e+02  4.226e+01   2.665 0.007709 ** 
-    ## num_keywords                             -3.263e+01  4.017e+01  -0.812 0.416717    
-    ## average_token_length                      8.590e+02  5.464e+02   1.572 0.115973    
-    ## is_weekend                                4.694e+02  1.959e+02   2.396 0.016596 *  
-    ## global_subjectivity                       3.476e+03  8.711e+02   3.990 6.67e-05 ***
-    ## global_sentiment_polarity                 2.036e+04  7.314e+03   2.784 0.005375 ** 
-    ## title_sentiment_polarity                  6.423e+02  2.845e+02   2.258 0.023980 *  
-    ## self_reference_avg_sharess                7.104e-03  3.490e-03   2.035 0.041832 *  
-    ## rate_positive_words                      -1.359e+04  3.705e+03  -3.668 0.000246 ***
-    ## n_tokens_title:average_token_length      -1.697e+02  5.026e+01  -3.376 0.000739 ***
-    ## n_tokens_title:global_sentiment_polarity -2.032e+03  6.761e+02  -3.005 0.002662 ** 
-    ## n_tokens_title:rate_positive_words        1.491e+03  3.438e+02   4.336 1.47e-05 ***
-    ## n_tokens_content:num_imgs                -8.643e-02  1.859e-02  -4.650 3.37e-06 ***
-    ## num_imgs:num_keywords                     3.277e+01  6.846e+00   4.787 1.72e-06 ***
-    ## num_imgs:global_subjectivity              6.429e+02  1.074e+02   5.987 2.22e-09 ***
-    ## num_imgs:global_sentiment_polarity       -9.397e+02  1.983e+02  -4.738 2.19e-06 ***
+    ## (Intercept)                               7.369e+00  2.577e-01  28.591  < 2e-16 ***
+    ## n_tokens_title                            7.700e-03  2.320e-02   0.332 0.739966    
+    ## n_tokens_content                         -6.728e-05  2.683e-05  -2.507 0.012186 *  
+    ## num_hrefs                                 7.393e-03  1.077e-03   6.865 7.12e-12 ***
+    ## num_imgs                                 -1.891e-02  8.631e-03  -2.191 0.028500 *  
+    ## num_videos                                3.089e-02  5.642e-03   5.476 4.48e-08 ***
+    ## num_keywords                              1.069e-03  5.363e-03   0.199 0.841970    
+    ## average_token_length                     -1.933e-01  7.294e-02  -2.650 0.008067 ** 
+    ## is_weekend                                2.795e-01  2.615e-02  10.686  < 2e-16 ***
+    ## global_subjectivity                       6.847e-01  1.163e-01   5.888 4.06e-09 ***
+    ## global_sentiment_polarity                 8.062e-01  9.763e-01   0.826 0.408960    
+    ## title_sentiment_polarity                  1.171e-01  3.797e-02   3.085 0.002045 ** 
+    ## self_reference_avg_sharess                2.229e-06  4.659e-07   4.784 1.75e-06 ***
+    ## rate_positive_words                       1.225e-01  4.946e-01   0.248 0.804429    
+    ## n_tokens_title:average_token_length       9.825e-05  6.710e-03   0.015 0.988317    
+    ## n_tokens_title:global_sentiment_polarity -7.076e-02  9.025e-02  -0.784 0.433027    
+    ## n_tokens_title:rate_positive_words        1.917e-02  4.590e-02   0.418 0.676177    
+    ## n_tokens_content:num_imgs                -9.511e-06  2.481e-06  -3.833 0.000127 ***
+    ## num_imgs:num_keywords                     3.807e-03  9.140e-04   4.166 3.14e-05 ***
+    ## num_imgs:global_subjectivity              6.726e-02  1.433e-02   4.692 2.74e-06 ***
+    ## num_imgs:global_sentiment_polarity       -7.896e-02  2.647e-02  -2.983 0.002866 ** 
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
-    ## Residual standard error: 5996 on 8406 degrees of freedom
-    ## Multiple R-squared:  0.03298,    Adjusted R-squared:  0.03068 
-    ## F-statistic: 14.34 on 20 and 8406 DF,  p-value: < 2.2e-16
+    ## Residual standard error: 0.8004 on 8406 degrees of freedom
+    ## Multiple R-squared:  0.07304,    Adjusted R-squared:  0.07084 
+    ## F-statistic: 33.12 on 20 and 8406 DF,  p-value: < 2.2e-16
 
 ## Random Forest Model
 
+…Placeholder for description of Random Forest model…
+
 ``` r
 # Fit the random forest Model
-#rfFit <- train(log(shares) ~ .,
-#               data = world_news_train,
-#               method = "rf",
-#               trControl = trainControl(method = "repeatedcv",
-#                                        number = 5,
-#                                        repeats = 3),
-#               tuneGrid = data.frame(mtry = 1:15))
-
-#rmse(rfFit, world_news_train)
+rfFit <- train(log(shares) ~ .,
+               data = world_news_train,
+               method = "rf",
+               trControl = trainControl(method = "cv", number = 5),
+               preProcess = c("center", "scale"),
+               tuneGrid = data.frame(mtry = 1:17))
 ```
 
 ## Boosted Tree Model
 
+…Placeholder for description of Boosted Tree Model…
+
 ``` r
-#control <- trainControl(method = "repeatedcv", number = 5, repeats = 3)
-#boostedFit <- train(HeartDisease ~ ., data = heartTrain, 
-#                    method = "gbm",
-#                    trControl = control,
-#                    preProcess = c("center", "scale"),
-#                    tuneGrid = expand.grid(n.trees = c(25, 50, 100, 150, 200),
-#                                           interaction.depth = c(1:4),
-#                                           shrinkage = 0.1,
-#                                           n.minobsinnode = 10))
-#
-#boostedFitPredict <- predict(boostedFit, newdata = heartTest)
-#confusionMatrix(boostedFitPredict, heartTest$HeartDisease )
+control <- trainControl(method = "cv", number = 5)
+boostedFit <- train(log(shares) ~ ., data = world_news_train, 
+                    method = "gbm",
+                    trControl = control,
+                    preProcess = c("center", "scale"),
+                    tuneGrid = expand.grid(n.trees = c(25, 50, 100, 150, 200),
+                                           interaction.depth = c(1:4),
+                                           shrinkage = 0.1,
+                                           n.minobsinnode = 10),
+                    verbose = FALSE)
 ```
+
+## Comparison
+
+``` r
+prediction <- predict(lm1Fit, newdata = world_news_train)
+lm1 <- round(postResample(prediction, log(world_news_train$shares)), 3)
+
+prediction <- predict(lm2Fit, newdata = world_news_train)
+lm2 <- round(postResample(prediction, log(world_news_train$shares)), 3)
+
+prediction <- predict(rfFit, newdata = world_news_train)
+rf <- round(postResample(prediction, log(world_news_train$shares)), 3)
+
+prediction <- predict(boostedFit, newdata = world_news_train)
+boost <- round(postResample(prediction, log(world_news_train$shares)), 3)
+
+compareFits <- data.frame(lm1, lm2, rf, boost)
+names(compareFits) <- c("Linear Model 1", 
+                        "Linear Model 2",
+                        "Random Forest Model",
+                        "Boosted Tree Model")
+
+compareFitsLong <- data.frame(t(compareFits))
+
+knitr::kable(compareFitsLong)
+```
+
+|                     |  RMSE | Rsquared |   MAE |
+| :------------------ | ----: | -------: | ----: |
+| Linear Model 1      | 0.776 |    0.120 | 0.546 |
+| Linear Model 2      | 0.798 |    0.070 | 0.567 |
+| Random Forest Model | 0.333 |    0.951 | 0.229 |
+| Boosted Tree Model  | 0.741 |    0.207 | 0.525 |
+
+We will choose the model with the lowest RMSE.
+
+``` r
+# Sort the compareFitsLong table by ascending RMSE and pick the first row as the model
+modelChosen <- compareFitsLong %>% arrange(RMSE) %>% filter(row_number()==1) %>% row.names()
+
+# Based on the model name, fit the corresponding model to the test data
+if (modelChosen == "Linear Model 1"){
+    prediction <- predict(lm1Fit, newdata=world_news_test)
+   }else if (modelChosen == "Linear Model 2"){
+      prediction <- predict(lm2Fit, newdata=world_news_test)
+   }else if (modelChosen == "Random Forest Model"){
+      prediction <- predict(rfFit, newdata=world_news_test)
+   }else if (modelChosen == "Boosted Tree Model"){
+      prediction <- predict(boostedFit, newdata=world_news_test)
+   }
+
+# Fit results of the final chosen model 
+finalModel <- data.frame(round(postResample(prediction, log(world_news_test$shares)), 3))
+```
+
+Our final model is the Random Forest Model. When we fit the model on the
+test data we get RMSE=0.775, Rsquared=0.146, and MAE=0.545.
