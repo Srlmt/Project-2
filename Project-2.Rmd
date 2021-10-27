@@ -12,11 +12,33 @@ library(tidyverse)
 library(corrplot)
 library(caret)
 library(modelr)
+library(DiagrammeR)
 ```
 
 # Introduction
 
-...Placeholder for introduction...
+This project is a simple walk-through of these steps of the data science process:
+
+```{r flowchart, echo=FALSE}
+DiagrammeR::grViz("digraph {
+  graph [layout = dot, rankdir = LR]
+  
+  node [shape = rectangle]        
+  rec1 [label = 'Data Preparation']
+  rec2 [label = 'Exploratory Data Analysis']
+  rec3 [label =  'Model Selection']
+  rec4 [label = 'Model Evaluation']
+  
+  rec1 -> rec2 -> rec3 -> rec4
+  }",
+  height = 100)
+```
+
+We'll be using the `OnlineNewsPopularity` dataset from the [UC Irvine Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity). It includes continuous and categorical variables about articles published by Mashable (www.mashable.com) over a period of two years. Our goal is to predict the popularity of articles in social networks (number of `shares`) using 58 predictive variables.
+
+The 58 predictive variables can be grouped together by the similar attributes each measures. There are integer variables that measure the number of words, keywords, hyperlinks, images, and videos within the article itself and its title; binary variables that categorize on what day of the week the article was published; variables that measure the rate of positive/negative words in the content; and variables measuring polarity, subjectivity, and sentiment of the article or title. 
+
+After completing EDA, we will describe and demonstrate building 4 predictive models: 2 linear regression models and 2 ensemble models (Random Forest and Boosted Tree). Finally, we will select the model that has the lowest root mean square error (RMSE).
 
 # Data Preparation
 ```{r data}
@@ -419,3 +441,4 @@ finalModel <- data.frame(round(postResample(prediction, log(world_news_test$shar
 ```
 
 Our final model is the `r modelChosen`. When we fit the model on the test data we get RMSE=`r finalModel[1, 1]`,  Rsquared=`r testResult[2, 1]`, and MAE=`r testResult[3, 1]`.
+
