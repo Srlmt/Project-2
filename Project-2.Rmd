@@ -278,7 +278,7 @@ corrplot(cormatrix, type = "upper", order = "hclust",
          tl.col = "black", tl.srt = 45)
 ```
 
-# Modeling
+# Model Selection
 
 ```{r Partitioning of Train and Test Data}
 set.seed(31415)
@@ -393,7 +393,7 @@ boostedFit <- train(log(shares) ~ ., data = world_news_train,
                     verbose = FALSE)
 ```
 
-## Comparison
+## Model Evaluation
 
 ```{r compare training}
 prediction <- predict(lm1Fit, newdata = world_news_train)
