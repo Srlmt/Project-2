@@ -38,7 +38,7 @@ We'll be using the `OnlineNewsPopularity` dataset from the [UC Irvine Machine Le
 
 The 58 predictive variables can be grouped together by the similar attributes each measures. There are integer variables that measure the number of words, keywords, hyperlinks, images, and videos within the article itself and its title; binary variables that categorize on what day of the week the article was published; variables that measure the rate of positive/negative words in the content; and variables measuring polarity, subjectivity, and sentiment of the article or title. 
 
-After completing EDA, we will describe and demonstrate building 4 predictive models: 2 linear regression models and 2 ensemble models (Random Forest and Boosted Tree). Finally, we will select the model that has the lowest root mean square error (RMSE).
+After completing EDA, we will describe and demonstrate building 4 predictive models: 2 linear regression models and 2 ensemble models (Random Forest and Boosted Tree). Finally, we will select the model that has the lowest root mean square error (RMSE) as the "best fit".
 
 # Data Preparation
 ```{r data}
