@@ -12,27 +12,15 @@ library(tidyverse)
 library(corrplot)
 library(caret)
 library(modelr)
-library(DiagrammeR)
 ```
 
 # Introduction
 
 This project is a simple walk-through of these steps of the data science process:
 
-```{r flowchart, echo=FALSE}
-#DiagrammeR::grViz("digraph {
-#  graph [layout = dot, rankdir = LR]
-#  
-#  node [shape = rectangle]        
-#  rec1 [label = 'Data Preparation']
-#  rec2 [label = 'Exploratory Data Analysis']
-#  rec3 [label =  'Model Selection']
-#  rec4 [label = 'Model Evaluation']
-#  
-#  rec1 -> rec2 -> rec3 -> rec4
-#  }",
-#  height = 100)
-```
+
+> Data Preparation $\rightarrow$ Exploratory Data Analysis $\rightarrow$ Model Selection $\rightarrow$ Model Evaluation
+
 
 We'll be using the `OnlineNewsPopularity` dataset from the [UC Irvine Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity). It includes continuous and categorical variables about articles published by Mashable (www.mashable.com) over a period of two years. Our goal is to predict the popularity of articles in social networks (number of `shares`) using 58 predictive variables.
 
