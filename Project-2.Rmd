@@ -19,7 +19,7 @@ library(modelr)
 This project is a simple walk-through of these steps of the data science process:
 
 
-> Data Preparation $\rightarrow$ Exploratory Data Analysis $\rightarrow$ Model Selection $\rightarrow$ Model Evaluation
+>Data Preparation --> Exploratory Data Analysis --> Model Selection --> Model Evaluation
 
 
 We'll be using the `OnlineNewsPopularity` dataset from the [UC Irvine Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/). It includes continuous and categorical variables about articles published by Mashable (www.mashable.com) over a period of two years. Our goal is to predict the popularity of articles in social networks (number of `shares`) using 58 predictive variables.
