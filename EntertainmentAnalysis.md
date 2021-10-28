@@ -86,7 +86,7 @@ ggplot(world_news_data, aes(x=shares)) +
   labs(title="Histogram of shares")
 ```
 
-![](WorldAnalysis_files/figure-gfm/Joey%20EDA%20shares-1.png)<!-- -->
+![](EntertainmentAnalysis_files/figure-gfm/Joey%20EDA%20shares-1.png)<!-- -->
 
 From the histogram We can see that the distribution is heavily right
 skewed. The histogram scale may be influenced by potential outliers, so
@@ -99,7 +99,7 @@ ggplot(filter(world_news_data, shares < 5000), aes(x=shares)) +
   labs(title="Histogram of shares under 5000")
 ```
 
-![](WorldAnalysis_files/figure-gfm/Joey%20EDA%20shares%20le%205000-1.png)<!-- -->
+![](EntertainmentAnalysis_files/figure-gfm/Joey%20EDA%20shares%20le%205000-1.png)<!-- -->
 
 As we can see, the distribution is still heavily right skewed. So we may
 want to look at the distribution of `log(shares)`.
@@ -111,7 +111,7 @@ ggplot(world_news_data, aes(x=log(shares))) +
   labs(title="Histogram of log(shares)")
 ```
 
-![](WorldAnalysis_files/figure-gfm/Joey%20EDA%20log%20shares-1.png)<!-- -->
+![](EntertainmentAnalysis_files/figure-gfm/Joey%20EDA%20log%20shares-1.png)<!-- -->
 
 From the histogram we can see that the distribution is slightly right
 skewed. But it is much closer to normal compared to the original
@@ -185,7 +185,7 @@ ggplot(world_news_data2, aes(x = day_published, y = log(shares))) +
        title = "Log(Shares) by Day of Publication")
 ```
 
-![](WorldAnalysis_files/figure-gfm/John%20EDA1-1.png)<!-- -->
+![](EntertainmentAnalysis_files/figure-gfm/John%20EDA1-1.png)<!-- -->
 
 After viewing the boxplot above, you should be able to determine what
 day (or days) have the highest mean/median shares compared to other
@@ -204,7 +204,7 @@ ggplot(world_news_data, aes(x = as.factor(is_weekend), y = log(shares))) +
        title = "Log(Shares) by Day of Publication")
 ```
 
-![](WorldAnalysis_files/figure-gfm/John%20EDA2-1.png)<!-- -->
+![](EntertainmentAnalysis_files/figure-gfm/John%20EDA2-1.png)<!-- -->
 
 ## Summary by Interval
 
@@ -335,7 +335,7 @@ ggplot(world_news_data, aes(x = as.factor(num_keywords), y = log(shares))) +
        title = "Log(Shares) by Number of Keywords")
 ```
 
-![](WorldAnalysis_files/figure-gfm/John%20EDA6-1.png)<!-- -->
+![](EntertainmentAnalysis_files/figure-gfm/John%20EDA6-1.png)<!-- -->
 
 ## Log(shares) by Number of Images and Videos
 
@@ -353,7 +353,7 @@ ggplot(world_news_data, aes(x = num_imgs, y = log(shares))) +
   labs(title="Scatterplot of Number of Images vs log(shares)")
 ```
 
-![](WorldAnalysis_files/figure-gfm/Joey%20EDA%20img%20video-1.png)<!-- -->
+![](EntertainmentAnalysis_files/figure-gfm/Joey%20EDA%20img%20video-1.png)<!-- -->
 
 ``` r
 # Scatterplot of num_videos and log(shares)
@@ -363,7 +363,7 @@ ggplot(world_news_data, aes(x = num_videos, y = log(shares))) +
   labs(title="Scatterplot of Number of Videos vs log(shares)")
 ```
 
-![](WorldAnalysis_files/figure-gfm/Joey%20EDA%20img%20video-2.png)<!-- -->
+![](EntertainmentAnalysis_files/figure-gfm/Joey%20EDA%20img%20video-2.png)<!-- -->
 
 We can also examine the correlation coefficient (r) to observe the
 strength of the association. For absolute values of r, we can considered
@@ -401,7 +401,7 @@ corrplot(cormatrix, type = "upper", order = "hclust",
          tl.col = "black", tl.srt = 45)
 ```
 
-![](WorldAnalysis_files/figure-gfm/John%20EDA7-1.png)<!-- -->
+![](EntertainmentAnalysis_files/figure-gfm/John%20EDA7-1.png)<!-- -->
 
 ``` r
 # Create a correlogram for predictors that measure attributes of keywords 
@@ -411,7 +411,7 @@ corrplot(cormatrix, type = "upper", order = "hclust",
          tl.col = "black", tl.srt = 45)
 ```
 
-![](WorldAnalysis_files/figure-gfm/John%20EDA7-2.png)<!-- -->
+![](EntertainmentAnalysis_files/figure-gfm/John%20EDA7-2.png)<!-- -->
 
 ``` r
 # Create a correlogram for predictors that measure attributes of "positve" and
@@ -422,7 +422,7 @@ corrplot(cormatrix, type = "upper", order = "hclust",
          tl.col = "black", tl.srt = 45)
 ```
 
-![](WorldAnalysis_files/figure-gfm/John%20EDA7-3.png)<!-- -->
+![](EntertainmentAnalysis_files/figure-gfm/John%20EDA7-3.png)<!-- -->
 
 ``` r
 # Create a correlogram for predictors that measure attributes of article titles
@@ -432,7 +432,7 @@ corrplot(cormatrix, type = "upper", order = "hclust",
          tl.col = "black", tl.srt = 45)
 ```
 
-![](WorldAnalysis_files/figure-gfm/John%20EDA7-4.png)<!-- -->
+![](EntertainmentAnalysis_files/figure-gfm/John%20EDA7-4.png)<!-- -->
 
 # Model Selection
 
