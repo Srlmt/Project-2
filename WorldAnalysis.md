@@ -15,16 +15,38 @@ Joey Chen and John Williams
       - [Log(shares) by Number of Images and
         Videos](#logshares-by-number-of-images-and-videos)
       - [Correlation of Predictors](#correlation-of-predictors)
-  - [Modeling](#modeling)
+  - [Model Selection](#model-selection)
       - [Linear Model \#1](#linear-model-1)
       - [Linear Model \#2](#linear-model-2)
       - [Random Forest Model](#random-forest-model)
       - [Boosted Tree Model](#boosted-tree-model)
-      - [Comparison](#comparison)
+      - [Model Evaluation](#model-evaluation)
 
 # Introduction
 
-…Placeholder for introduction…
+This project is a simple walk-through of these steps of the data science
+process:
+
+We’ll be using the `OnlineNewsPopularity` dataset from the [UC Irvine
+Machine Learning
+Repository](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity).
+It includes continuous and categorical variables about articles
+published by Mashable (www.mashable.com) over a period of two years. Our
+goal is to predict the popularity of articles in social networks (number
+of `shares`) using 58 predictive variables.
+
+The 58 predictive variables can be grouped together by the similar
+attributes each measures. There are integer variables that measure the
+number of words, keywords, hyperlinks, images, and videos within the
+article itself and its title; binary variables that categorize on what
+day of the week the article was published; variables that measure the
+rate of positive/negative words in the content; and variables measuring
+polarity, subjectivity, and sentiment of the article or title.
+
+After completing EDA, we will describe and demonstrate building 4
+predictive models: 2 linear regression models and 2 ensemble models
+(Random Forest and Boosted Tree). Finally, we will select the model that
+has the lowest root mean square error (RMSE) as the “best fit”.
 
 # Data Preparation
 
@@ -404,7 +426,7 @@ corrplot(cormatrix, type = "upper", order = "hclust",
 
 ![](WorldAnalysis_files/figure-gfm/John%20EDA7-4.png)<!-- -->
 
-# Modeling
+# Model Selection
 
 ``` r
 set.seed(31415)
@@ -416,13 +438,19 @@ world_news_train <- world_news_data[partition,]
 world_news_test <- world_news_data[-partition,]
 ```
 
-…Placeholder for description of Linear model…
+Linear regression models a response variable as a linear combination of
+input predictor variables. The models are often fitted using the least
+squares approach, which is a method that finds the best fit by
+minimizing the sum of the squares of the residuals of the points from
+the curve. When we fit the model on the training data we would get
+coefficients corresponding to each of the predictor variables, and these
+coefficients can be used to make predictions on the response with
+predictor variables from the test data.
 
 ## Linear Model \#1
 
 ``` r
-lm1Fit <- lm(log(shares) ~ n_tokens_title +
-                     n_non_stop_words + 
+lm1Fit <- lm(log(shares) ~ n_non_stop_words + 
                      num_hrefs +
                      num_imgs + 
                      num_videos +
@@ -458,60 +486,59 @@ summary(lm1Fit)
 
     ## 
     ## Call:
-    ## lm(formula = log(shares) ~ n_tokens_title + n_non_stop_words + 
-    ##     num_hrefs + num_imgs + num_videos + average_token_length + 
-    ##     kw_min_min + kw_min_avg + kw_max_avg + kw_avg_avg + self_reference_avg_sharess + 
-    ##     weekday_is_monday + weekday_is_tuesday + weekday_is_wednesday + 
-    ##     weekday_is_thursday + weekday_is_friday + LDA_00 + LDA_02 + 
-    ##     global_subjectivity + title_sentiment_polarity + I(n_tokens_title^2) + 
-    ##     I(num_videos^2) + I(average_token_length^2) + I(kw_min_avg^2) + 
-    ##     I(kw_avg_avg^2) + I(self_reference_avg_sharess^2) + I(title_sentiment_polarity^2) + 
+    ## lm(formula = log(shares) ~ n_non_stop_words + num_hrefs + num_imgs + 
+    ##     num_videos + average_token_length + kw_min_min + kw_min_avg + 
+    ##     kw_max_avg + kw_avg_avg + self_reference_avg_sharess + weekday_is_monday + 
+    ##     weekday_is_tuesday + weekday_is_wednesday + weekday_is_thursday + 
+    ##     weekday_is_friday + LDA_00 + LDA_02 + global_subjectivity + 
+    ##     title_sentiment_polarity + I(n_tokens_title^2) + I(num_videos^2) + 
+    ##     I(average_token_length^2) + I(kw_min_avg^2) + I(kw_avg_avg^2) + 
+    ##     I(self_reference_avg_sharess^2) + I(title_sentiment_polarity^2) + 
     ##     num_hrefs:num_imgs + kw_min_min:weekday_is_tuesday + n_tokens_title:num_imgs, 
     ##     data = world_news_train)
     ## 
     ## Residuals:
     ##     Min      1Q  Median      3Q     Max 
-    ## -3.4534 -0.4405 -0.1163  0.3011  5.0505 
+    ## -3.4624 -0.4401 -0.1164  0.2997  5.0612 
     ## 
     ## Coefficients:
     ##                                   Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)                      7.328e+00  2.176e-01  33.681  < 2e-16 ***
-    ## n_tokens_title                  -6.580e-02  3.474e-02  -1.894 0.058300 .  
-    ## n_non_stop_words                 1.365e+01  2.703e+00   5.049 4.57e-07 ***
-    ## num_hrefs                        9.835e-03  1.366e-03   7.198 6.88e-13 ***
-    ## num_imgs                         5.343e-02  1.126e-02   4.745 2.13e-06 ***
-    ## num_videos                       3.690e-02  9.923e-03   3.718 0.000202 ***
-    ## average_token_length            -5.539e+00  1.118e+00  -4.953 7.51e-07 ***
-    ## kw_min_min                       1.452e-03  2.080e-04   6.981 3.27e-12 ***
-    ## kw_min_avg                      -2.566e-04  4.441e-05  -5.778 7.96e-09 ***
-    ## kw_max_avg                      -2.003e-05  7.118e-06  -2.814 0.004903 ** 
-    ## kw_avg_avg                       2.836e-04  3.351e-05   8.464  < 2e-16 ***
-    ## self_reference_avg_sharess       7.922e-06  1.234e-06   6.418 1.49e-10 ***
-    ## weekday_is_monday               -2.396e-01  3.804e-02  -6.299 3.22e-10 ***
-    ## weekday_is_tuesday              -2.655e-01  3.774e-02  -7.034 2.23e-12 ***
-    ## weekday_is_wednesday            -3.059e-01  3.704e-02  -8.259  < 2e-16 ***
-    ## weekday_is_thursday             -2.706e-01  3.696e-02  -7.320 2.82e-13 ***
-    ## weekday_is_friday               -2.364e-01  3.870e-02  -6.107 1.08e-09 ***
-    ## LDA_00                           3.098e-01  1.109e-01   2.794 0.005219 ** 
-    ## LDA_02                          -1.989e-01  5.601e-02  -3.551 0.000387 ***
-    ## global_subjectivity              4.362e-01  1.314e-01   3.319 0.000910 ***
-    ## title_sentiment_polarity         1.797e-01  4.341e-02   4.141 3.50e-05 ***
-    ## I(n_tokens_title^2)              4.027e-03  1.580e-03   2.548 0.010856 *  
-    ## I(num_videos^2)                 -1.117e-03  3.893e-04  -2.870 0.004123 ** 
-    ## I(average_token_length^2)        5.417e-01  1.157e-01   4.681 2.91e-06 ***
-    ## I(kw_min_avg^2)                  1.024e-07  2.200e-08   4.654 3.32e-06 ***
-    ## I(kw_avg_avg^2)                 -1.045e-08  3.852e-09  -2.712 0.006713 ** 
-    ## I(self_reference_avg_sharess^2) -1.394e-11  2.449e-12  -5.693 1.31e-08 ***
-    ## I(title_sentiment_polarity^2)    1.498e-01  7.145e-02   2.096 0.036124 *  
-    ## num_hrefs:num_imgs              -3.094e-04  9.603e-05  -3.221 0.001283 ** 
-    ## kw_min_min:weekday_is_tuesday   -1.005e-03  4.388e-04  -2.291 0.021979 *  
-    ## n_tokens_title:num_imgs         -3.376e-03  1.027e-03  -3.285 0.001024 ** 
+    ## (Intercept)                      6.973e+00  1.107e-01  62.976  < 2e-16 ***
+    ## n_non_stop_words                 1.375e+01  2.703e+00   5.086 3.77e-07 ***
+    ## num_hrefs                        9.848e-03  1.367e-03   7.206 6.49e-13 ***
+    ## num_imgs                         5.599e-02  1.118e-02   5.008 5.67e-07 ***
+    ## num_videos                       3.722e-02  9.923e-03   3.751 0.000178 ***
+    ## average_token_length            -5.580e+00  1.118e+00  -4.989 6.23e-07 ***
+    ## kw_min_min                       1.451e-03  2.080e-04   6.974 3.42e-12 ***
+    ## kw_min_avg                      -2.570e-04  4.442e-05  -5.786 7.57e-09 ***
+    ## kw_max_avg                      -1.990e-05  7.119e-06  -2.795 0.005205 ** 
+    ## kw_avg_avg                       2.837e-04  3.352e-05   8.464  < 2e-16 ***
+    ## self_reference_avg_sharess       7.884e-06  1.234e-06   6.386 1.83e-10 ***
+    ## weekday_is_monday               -2.392e-01  3.805e-02  -6.286 3.50e-10 ***
+    ## weekday_is_tuesday              -2.645e-01  3.774e-02  -7.007 2.71e-12 ***
+    ## weekday_is_wednesday            -3.053e-01  3.705e-02  -8.241  < 2e-16 ***
+    ## weekday_is_thursday             -2.702e-01  3.697e-02  -7.307 3.09e-13 ***
+    ## weekday_is_friday               -2.346e-01  3.870e-02  -6.061 1.44e-09 ***
+    ## LDA_00                           3.099e-01  1.109e-01   2.794 0.005221 ** 
+    ## LDA_02                          -1.986e-01  5.603e-02  -3.544 0.000397 ***
+    ## global_subjectivity              4.379e-01  1.315e-01   3.331 0.000871 ***
+    ## title_sentiment_polarity         1.809e-01  4.341e-02   4.168 3.12e-05 ***
+    ## I(n_tokens_title^2)              1.076e-03  2.625e-04   4.097 4.23e-05 ***
+    ## I(num_videos^2)                 -1.131e-03  3.893e-04  -2.905 0.003689 ** 
+    ## I(average_token_length^2)        5.458e-01  1.157e-01   4.717 2.45e-06 ***
+    ## I(kw_min_avg^2)                  1.026e-07  2.200e-08   4.664 3.16e-06 ***
+    ## I(kw_avg_avg^2)                 -1.051e-08  3.853e-09  -2.729 0.006380 ** 
+    ## I(self_reference_avg_sharess^2) -1.390e-11  2.449e-12  -5.675 1.45e-08 ***
+    ## I(title_sentiment_polarity^2)    1.447e-01  7.141e-02   2.027 0.042732 *  
+    ## num_hrefs:num_imgs              -3.145e-04  9.601e-05  -3.276 0.001060 ** 
+    ## kw_min_min:weekday_is_tuesday   -1.006e-03  4.389e-04  -2.292 0.021940 *  
+    ## num_imgs:n_tokens_title         -3.611e-03  1.020e-03  -3.540 0.000404 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
-    ## Residual standard error: 0.7781 on 5869 degrees of freedom
-    ## Multiple R-squared:  0.1195, Adjusted R-squared:  0.115 
-    ## F-statistic: 26.55 on 30 and 5869 DF,  p-value: < 2.2e-16
+    ## Residual standard error: 0.7782 on 5870 degrees of freedom
+    ## Multiple R-squared:  0.119,  Adjusted R-squared:  0.1146 
+    ## F-statistic: 27.33 on 29 and 5870 DF,  p-value: < 2.2e-16
 
 ## Linear Model \#2
 
@@ -588,7 +615,22 @@ summary(lm2Fit)
 
 ## Random Forest Model
 
-…Placeholder for description of Random Forest model…
+The random forest model is a classification algorithm that consists of
+many decision trees. It creates multiple (e.g. 500) bootstrapped samples
+and fit decision trees to each of the bootstrapped samples. When
+selecting a split point, the learning algorithm selects a random sample
+of predictors of which to search, instead of all the predictors. By not
+looking at all the predictors every time, it prevents one or two strong
+predictors to dominate the tree fits.  
+The prediction of trees are then averaged (for regression) to get the
+final predicted value. This would lead to less variance and better fit
+over an individual tree fit.
+
+Regarding the number of predictors to look for, a good rule of thumb is
+m = sqrt(p) for classification and m=p/3 for regression, where m is the
+number of randomly selected features at each point, and p is the number
+of input variables. In our dataset there are 52 predictors so we will be
+using m = 17.
 
 ``` r
 # Fit the random forest Model
@@ -617,20 +659,23 @@ boostedFit <- train(log(shares) ~ ., data = world_news_train,
                     verbose = FALSE)
 ```
 
-## Comparison
+## Model Evaluation
+
+We can compare the RMSE, Rsquared, and MAE of the four model fits on the
+test data.
 
 ``` r
-prediction <- predict(lm1Fit, newdata = world_news_train)
-lm1 <- round(postResample(prediction, log(world_news_train$shares)), 3)
+prediction <- predict(lm1Fit, newdata = world_news_test)
+lm1 <- round(postResample(prediction, log(world_news_test$shares)), 4)
 
-prediction <- predict(lm2Fit, newdata = world_news_train)
-lm2 <- round(postResample(prediction, log(world_news_train$shares)), 3)
+prediction <- predict(lm2Fit, newdata = world_news_test)
+lm2 <- round(postResample(prediction, log(world_news_test$shares)), 4)
 
-prediction <- predict(rfFit, newdata = world_news_train)
-rf <- round(postResample(prediction, log(world_news_train$shares)), 3)
+prediction <- predict(rfFit, newdata = world_news_test)
+rf <- round(postResample(prediction, log(world_news_test$shares)), 4)
 
-prediction <- predict(boostedFit, newdata = world_news_train)
-boost <- round(postResample(prediction, log(world_news_train$shares)), 3)
+prediction <- predict(boostedFit, newdata = world_news_test)
+boost <- round(postResample(prediction, log(world_news_test$shares)), 4)
 
 compareFits <- data.frame(lm1, lm2, rf, boost)
 names(compareFits) <- c("Linear Model 1", 
@@ -643,33 +688,18 @@ compareFitsLong <- data.frame(t(compareFits))
 knitr::kable(compareFitsLong)
 ```
 
-|                     |  RMSE | Rsquared |   MAE |
-| :------------------ | ----: | -------: | ----: |
-| Linear Model 1      | 0.776 |    0.120 | 0.546 |
-| Linear Model 2      | 0.798 |    0.070 | 0.567 |
-| Random Forest Model | 0.333 |    0.951 | 0.229 |
-| Boosted Tree Model  | 0.741 |    0.207 | 0.525 |
+|                     |   RMSE | Rsquared |    MAE |
+| :------------------ | -----: | -------: | -----: |
+| Linear Model 1      | 0.7878 |   0.1164 | 0.5526 |
+| Linear Model 2      | 0.8034 |   0.0808 | 0.5672 |
+| Random Forest Model | 0.7754 |   0.1457 | 0.5447 |
+| Boosted Tree Model  | 0.7725 |   0.1516 | 0.5392 |
 
 We will choose the model with the lowest RMSE.
 
 ``` r
-# Sort the compareFitsLong table by ascending RMSE and pick the first row as the model
-modelChosen <- compareFitsLong %>% arrange(RMSE) %>% filter(row_number()==1) %>% row.names()
-
-# Based on the model name, fit the corresponding model to the test data
-if (modelChosen == "Linear Model 1"){
-    prediction <- predict(lm1Fit, newdata=world_news_test)
-   }else if (modelChosen == "Linear Model 2"){
-      prediction <- predict(lm2Fit, newdata=world_news_test)
-   }else if (modelChosen == "Random Forest Model"){
-      prediction <- predict(rfFit, newdata=world_news_test)
-   }else if (modelChosen == "Boosted Tree Model"){
-      prediction <- predict(boostedFit, newdata=world_news_test)
-   }
-
-# Fit results of the final chosen model 
-finalModel <- data.frame(round(postResample(prediction, log(world_news_test$shares)), 3))
+# Sort the table of models by ascending RMSE and pick the first row as the model
+finalModel <- compareFitsLong %>% arrange(RMSE) %>% filter(row_number()==1) 
 ```
 
-Our final model is the Random Forest Model. When we fit the model on the
-test data we get RMSE=0.775, Rsquared=0.146, and MAE=0.545.
+### Our final model is the Boosted Tree Model. When we fit the model on the test data we get RMSE=0.7725, Rsquared=0.1516, and MAE=0.5392.
