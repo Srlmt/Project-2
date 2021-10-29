@@ -23,9 +23,6 @@ Joey Chen and John Williams
       - [Random Forest Model](#random-forest-model)
       - [Boosted Tree Model](#boosted-tree-model)
   - [Model Evaluation](#model-evaluation)
-      - [Our final model is the Random Forest Model. When we fit the
-        model on the test data we get RMSE=0.9291, Rsquared=0.0543, and
-        MAE=0.7123.](#our-final-model-is-the-random-forest-model.-when-we-fit-the-model-on-the-test-data-we-get-rmse0.9291-rsquared0.0543-and-mae0.7123.)
 
 # Introduction
 
@@ -778,7 +775,7 @@ boostedFit <- train(log(shares) ~ ., data = world_news_train,
 # Model Evaluation
 
 We can compare the RMSE, Rsquared, and MAE of the four model fits on the
-test data.
+test data. We will be choosing the model with the lowest RMSE.
 
 ``` r
 prediction <- predict(lm1Fit, newdata = world_news_test)
@@ -801,6 +798,9 @@ names(compareFits) <- c("Linear Model 1",
 
 compareFitsLong <- data.frame(t(compareFits))
 
+# Sort the table of models by ascending RMSE and pick the first row as the model
+finalModel <- compareFitsLong %>% arrange(RMSE) %>% filter(row_number()==1) 
+
 knitr::kable(compareFitsLong)
 ```
 
@@ -811,11 +811,5 @@ knitr::kable(compareFitsLong)
 | Random Forest Model | 0.9291 |   0.0543 | 0.7123 |
 | Boosted Tree Model  | 0.9458 |   0.0209 | 0.7190 |
 
-We will choose the model with the lowest RMSE.
-
-``` r
-# Sort the table of models by ascending RMSE and pick the first row as the model
-finalModel <- compareFitsLong %>% arrange(RMSE) %>% filter(row_number()==1) 
-```
-
-### Our final model is the Random Forest Model. When we fit the model on the test data we get RMSE=0.9291, Rsquared=0.0543, and MAE=0.7123.
+Our final model is the Random Forest Model. When we fit the model on the
+test data we get RMSE=0.9291, Rsquared=0.0543, and MAE=0.7123.

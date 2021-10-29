@@ -438,7 +438,7 @@ boostedFit <- train(log(shares) ~ ., data = world_news_train,
 
 # Model Evaluation
 
-We can compare the RMSE, Rsquared, and MAE of the four model fits on the test data.
+We can compare the RMSE, Rsquared, and MAE of the four model fits on the test data. We will be choosing the model with the lowest RMSE.
 
 ```{r compare training}
 prediction <- predict(lm1Fit, newdata = world_news_test)
@@ -461,14 +461,10 @@ names(compareFits) <- c("Linear Model 1",
 
 compareFitsLong <- data.frame(t(compareFits))
 
-knitr::kable(compareFitsLong)
-```
-
-We will choose the model with the lowest RMSE.
-
-```{r choose model}
 # Sort the table of models by ascending RMSE and pick the first row as the model
 finalModel <- compareFitsLong %>% arrange(RMSE) %>% filter(row_number()==1) 
-```
 
-### Our final model is the `r row.names(finalModel)`. When we fit the model on the test data we get RMSE=`r finalModel[1, 1]`,  Rsquared=`r finalModel[1, 2]`, and MAE=`r finalModel[1, 3]`.
+knitr::kable(compareFitsLong)
+```
+  
+Our final model is the `r row.names(finalModel)`. When we fit the model on the test data we get RMSE=`r finalModel[1, 1]`,  Rsquared=`r finalModel[1, 2]`, and MAE=`r finalModel[1, 3]`.
