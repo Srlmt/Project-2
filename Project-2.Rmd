@@ -388,9 +388,9 @@ boostedFit <- train(log(shares) ~ ., data = world_news_train,
                     method = "gbm",
                     trControl = control,
                     preProcess = c("center", "scale"),
-                    tuneGrid = expand.grid(n.trees = c(25, 50, 100, 150, 200),
-                                           interaction.depth = c(1:4),
-                                           shrinkage = 0.1,
+                    tuneGrid = expand.grid(n.trees = c(300, 350, 400, 450, 500),
+                                           interaction.depth = c(14:24),
+                                           shrinkage = c(0.01),
                                            n.minobsinnode = 10),
                     verbose = FALSE)
 ```
