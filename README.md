@@ -18,12 +18,12 @@ The following packages are required for this project:
 
 # Links to Analyses
 
-The analysis for [Business articles is available here](BusAnalysis.html)
-The analysis for [Entertainment articles is available here](EntertainmentAnalysis.html)
-The analysis for [Lifestyle articles is available here](LifestyleAnalysis.html)
-The analysis for [Social Media articles is available here](SocmedAnalysis.html)
-The analysis for [Tech articles is available here](TechAnalysis.html)
-The analysis for [World articles is available here](WorldAnalysis.html)
+  - The analysis for [Business articles is available here](BusAnalysis.html)
+  - The analysis for [Entertainment articles is available here](EntertainmentAnalysis.html)
+  - The analysis for [Lifestyle articles is available here](LifestyleAnalysis.html)
+  - The analysis for [Social Media articles is available here](SocmedAnalysis.html)
+  - The analysis for [Tech articles is available here](TechAnalysis.html)
+  - The analysis for [World articles is available here](WorldAnalysis.html)
 
 # Render Code
 
