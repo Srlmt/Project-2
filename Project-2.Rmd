@@ -368,6 +368,12 @@ summary(lm1Fit)
 
 ## Linear Model #2
 
+We built this model using our best judgment given what we knew about the data. Using all 52 of the predictors (and their interactions) would not be manageable or parsimonious. We chose a limited number of predictors using EDA and common sense in order to limit colinearity and maintain simplicity of the model.
+
+First, we selected variables that we believed would have be the "best" predictors of the number of shares. Recall that many of the predictors could be grouped into categories based on the common attributes each measured. We made an effort to pick at least one predictor from each category. For example, of the 8 variables that measure day of publication, we chose only `is_weekend` to include in our linear model; or, of the 10 variables that measure keyword attributes, we chose only `num_keywords` to include in our linear model. At the end of this step, we landed on using 13 predictors. We decided not to include higher order predictors to reduce complexity.
+
+Next, we fit a full model using all 13 of our selected predictors with all their associated interactions. This produced a very high dimensional model. To quickly obtain parsimony, we "unscientifically" selected to include into a reduced model our 13 predictors and only the interaction terms that were highly significant within the full model. There were only 7 of these interaction terms. This reduced model is what is used in the code below for building Linear Model #2.
+
 ```{r John Linear Model}
 # Remove variables with possible colinearity
 reduced_world_news_data <- world_news_data %>%
