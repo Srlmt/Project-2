@@ -3,32 +3,34 @@ Project 2
 Joey Chen and John Williams
 10/24/2021
 
--   [Introduction](#introduction)
--   [Data Preparation](#data-preparation)
--   [Exploratory Data Analysis](#exploratory-data-analysis)
-    -   [Distribution of Response
+  - [Introduction](#introduction)
+  - [Data Preparation](#data-preparation)
+  - [Exploratory Data Analysis](#exploratory-data-analysis)
+      - [Distribution of Response
         Variable](#distribution-of-response-variable)
-    -   [Log(shares) by Day of Week](#logshares-by-day-of-week)
-    -   [Summary by Interval](#summary-by-interval)
-    -   [Log(shares) by Number of
+      - [Log(shares) by Number of Words in the
+        Title](#logshares-by-number-of-words-in-the-title)
+      - [Log(shares) by Day of Week](#logshares-by-day-of-week)
+      - [Summary by Interval](#summary-by-interval)
+      - [Log(shares) by Number of
         Keywords](#logshares-by-number-of-keywords)
-    -   [Log(shares) by Number of Images and
+      - [Log(shares) by Number of Images and
         Videos](#logshares-by-number-of-images-and-videos)
-    -   [Correlation of Predictors](#correlation-of-predictors)
--   [Model Selection](#model-selection)
-    -   [Linear Model \#1](#linear-model-1)
-    -   [Linear Model \#2](#linear-model-2)
-    -   [Random Forest Model](#random-forest-model)
-    -   [Boosted Tree Model](#boosted-tree-model)
-    -   [Model Evaluation](#model-evaluation)
+      - [Correlation of Predictors](#correlation-of-predictors)
+  - [Model Selection](#model-selection)
+      - [Linear Model \#1](#linear-model-1)
+      - [Linear Model \#2](#linear-model-2)
+      - [Random Forest Model](#random-forest-model)
+      - [Boosted Tree Model](#boosted-tree-model)
+  - [Model Evaluation](#model-evaluation)
 
 # Introduction
 
 This project is a simple walk-through of these steps of the data science
 process:
 
-> Data Preparation –&gt; Exploratory Data Analysis –&gt; Model Selection
-> –&gt; Model Evaluation
+> Data Preparation –\> Exploratory Data Analysis –\> Model Selection –\>
+> Model Evaluation
 
 We’ll be using the `OnlineNewsPopularity` dataset from the [UC Irvine
 Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/).
@@ -82,7 +84,7 @@ First, we can take a look at the distribution of our response variable
 ``` r
 # Histogram of shares
 ggplot(world_news_data, aes(x=shares)) +
-  geom_histogram(bins=50) +
+  geom_histogram(bins=50, fill="navy", col="darkgreen") +
   labs(title="Histogram of shares")
 ```
 
@@ -90,12 +92,12 @@ ggplot(world_news_data, aes(x=shares)) +
 
 From the histogram We can see that the distribution is heavily right
 skewed. The histogram scale may be influenced by potential outliers, so
-we can look at the distribution of `shares` under 10,000.
+we can look at the distribution of `shares` under 5,000.
 
 ``` r
 # Histogram of shares < 5000
 ggplot(filter(world_news_data, shares < 5000), aes(x=shares)) +
-  geom_histogram(bins=50) +
+  geom_histogram(bins=50, fill="navy", col="darkgreen") +
   labs(title="Histogram of shares under 5000")
 ```
 
@@ -107,7 +109,7 @@ want to look at the distribution of `log(shares)`.
 ``` r
 # Histogram of log(shares) 
 ggplot(world_news_data, aes(x=log(shares))) +
-  geom_histogram(bins=50) +
+  geom_histogram(bins=50, fill="navy", col="darkgreen") +
   labs(title="Histogram of log(shares)")
 ```
 
@@ -127,14 +129,15 @@ shares_summary <- world_news_data %>% summarise(Min. = min(shares),
                                                 Mean = mean(shares),
                                                 SD = sd(shares),
                                                 Q3 = quantile(shares, 0.75),
-                                                Max = max(shares))
+                                                Max = max(shares),
+                                                CV = scales::percent(SD / Mean))
 
 knitr::kable(shares_summary, digits=0, caption = "Numeric Summary of Shares")
 ```
 
-| Min. |   Q1 | Median | Mean |   SD |   Q3 |    Max |
-|-----:|-----:|-------:|-----:|-----:|-----:|-------:|
-|   28 | 1100 |   1700 | 3682 | 8885 | 3250 | 208300 |
+| Min. |   Q1 | Median | Mean |   SD |   Q3 |    Max | CV   |
+| ---: | ---: | -----: | ---: | ---: | ---: | -----: | :--- |
+|   28 | 1100 |   1700 | 3682 | 8885 | 3250 | 208300 | 241% |
 
 Numeric Summary of Shares
 
@@ -146,22 +149,93 @@ log_shares_summary <- world_news_data %>% summarise(Min. = min(log(shares)),
                                                 Mean = mean(log(shares)),
                                                 SD = sd(log(shares)),
                                                 Q3 = quantile(log(shares), 0.75),
-                                                Max = max(log(shares)))
+                                                Max = max(log(shares)),
+                                                CV = scales::percent(SD / Mean))
 
 knitr::kable(log_shares_summary, digits=3, caption="Numeric Summary of log(Shares)")
 ```
 
-|  Min. |    Q1 | Median |  Mean |    SD |    Q3 |    Max |
-|------:|------:|-------:|------:|------:|------:|-------:|
-| 3.332 | 7.003 |  7.438 | 7.606 | 0.943 | 8.086 | 12.247 |
+|  Min. |    Q1 | Median |  Mean |    SD |    Q3 |    Max | CV  |
+| ----: | ----: | -----: | ----: | ----: | ----: | -----: | :-- |
+| 3.332 | 7.003 |  7.438 | 7.606 | 0.943 | 8.086 | 12.247 | 12% |
 
 Numeric Summary of log(Shares)
 
 In addition to the histograms, we can see that the coefficient of
 variation (CV) is much larger in `shares` compared to `log(shares)`.
-This can make `shares` harder to predict. So we will continue to do EDA
-using `log(shares)` and will fit the models on `log(shares)` since that
-can also help reduce the impact of some extreme values of `shares`.
+This can make `shares` harder to predict since the variability is so
+high. So we will continue to do EDA using `log(shares)` and will fit the
+models on `log(shares)` since that can also help reduce the impact of
+some extreme values of `shares`.
+
+## Log(shares) by Number of Words in the Title
+
+We can investigate how the number of words in the title might impact
+log(shares). We can start by looking at the distribution of the title
+word count. We can see which title word counts are used the most within
+this data.
+
+``` r
+ggplot(data=world_news_data, aes(x=n_tokens_title)) +
+  geom_bar(col="darkblue", fill="darkgreen") +
+  labs(title="Bar graph of Number of Words in Title",
+       x="Number of Words in the Title")
+```
+
+![](BusAnalysis_files/figure-gfm/Joey%20EDA%20Title%20Words%20bar-1.png)<!-- -->
+
+Here is the numerical summary. We can see which title word count has the
+highest mean or median log(shares).
+
+``` r
+words_title_summary <- world_news_data %>% group_by("Title Word Count" = n_tokens_title) %>% summarise(n=length(log(shares)),
+                                                Min. = min(log(shares)),
+                                                Q1 = quantile(log(shares), 0.25),
+                                                Median = median(log(shares)),
+                                                Mean = mean(log(shares)),
+                                                SD = sd(log(shares)),
+                                                Q3 = quantile(log(shares), 0.75),
+                                                Max = max(log(shares)))
+
+knitr::kable(words_title_summary, digit=2, caption="Summary Log(shares) by Number of Words in the Title")
+```
+
+| Title Word Count |   n | Min. |   Q1 | Median | Mean |   SD |   Q3 |   Max |
+| ---------------: | --: | ---: | ---: | -----: | ---: | ---: | ---: | ----: |
+|                3 |   1 | 7.00 | 7.00 |   7.00 | 7.00 |   NA | 7.00 |  7.00 |
+|                5 |   7 | 6.41 | 6.89 |   7.44 | 7.58 | 1.08 | 7.88 |  9.67 |
+|                6 |  46 | 4.84 | 6.83 |   7.44 | 7.35 | 0.91 | 7.73 |  9.99 |
+|                7 | 161 | 5.04 | 7.00 |   7.31 | 7.51 | 0.91 | 8.01 |  9.91 |
+|                8 | 351 | 4.53 | 7.00 |   7.44 | 7.58 | 0.97 | 8.01 | 10.93 |
+|                9 | 432 | 5.06 | 7.00 |   7.50 | 7.70 | 1.01 | 8.19 | 12.25 |
+|               10 | 399 | 5.95 | 7.00 |   7.38 | 7.58 | 0.84 | 8.02 | 10.38 |
+|               11 | 335 | 3.33 | 7.00 |   7.44 | 7.62 | 0.96 | 8.16 | 11.30 |
+|               12 | 183 | 5.19 | 7.00 |   7.44 | 7.62 | 0.92 | 7.99 | 10.91 |
+|               13 | 121 | 4.36 | 7.00 |   7.38 | 7.60 | 1.01 | 8.22 | 10.90 |
+|               14 |  42 | 6.10 | 6.93 |   7.49 | 7.69 | 0.97 | 8.33 | 10.18 |
+|               15 |  12 | 6.56 | 7.04 |   7.24 | 7.45 | 0.77 | 7.56 |  9.13 |
+|               16 |   5 | 6.28 | 6.77 |   7.44 | 7.22 | 0.68 | 7.70 |  7.90 |
+|               17 |   3 | 6.46 | 7.00 |   7.55 | 7.34 | 0.79 | 7.78 |  8.01 |
+|               18 |   1 | 7.17 | 7.17 |   7.17 | 7.17 |   NA | 7.17 |  7.17 |
+
+Summary Log(shares) by Number of Words in the Title
+
+We can also assess the relationship between log(shares) and title word
+count by looking at the boxplot. The red dot represents the mean. Higher
+red dot means the articles are shared more on average, for that number
+of words in title. However, the mean can be heavily influenced by
+outliers.
+
+``` r
+ggplot(world_news_data, aes(x = as.factor(n_tokens_title), y = log(shares))) +
+  geom_boxplot(aes(fill=as.factor(n_tokens_title))) +
+  stat_summary(fun.y="mean", col="red") +
+  theme(legend.position = "none") +
+  labs(title="Boxplot of Log(shares) by Number of Words in title", 
+       x = "Number of Words in Title")
+```
+
+![](BusAnalysis_files/figure-gfm/Joey%20EDA%20Title%20Words%20Boxplot-1.png)<!-- -->
 
 ## Log(shares) by Day of Week
 
@@ -210,17 +284,17 @@ ggplot(world_news_data, aes(x = as.factor(is_weekend), y = log(shares))) +
 
 Let’s examine the relationship between a continuous variable that is
 within the range \[0, 1\] and `log(shares)`. One way we can do this by
-“cutting” the variable into 11 subintervals ((-0.5, 0.5\], (0.5, 1.5\],
-(1.5, 2.5\], etc.) and calculating the mean/median `log(shares)` for
-each subinterval. If the mean/median of `log(shares)` steadily increases
-as the predictor increases, then there is a positive relationship; if
-the mean/median of `log(shares)` steadily decreases as the predictor
-increases, then there is a negative relationship. If there is no clear
-pattern in the mean/median of `log(shares)` as the predictor increases,
-then we cannot make any statement about the linear relationship of that
-predictor and the response. For example, `title_subjectivity` has a
-range \[0, 1\]. Let’s see how the mean/median of `log(shares)` changes
-as `title_subjectivity` increases:
+“cutting” the variable into 11 subintervals ((-0.5, 0.5\], (0.5,
+1.5\], (1.5, 2.5\], etc.) and calculating the mean/median `log(shares)`
+for each subinterval. If the mean/median of `log(shares)` steadily
+increases as the predictor increases, then there is a positive
+relationship; if the mean/median of `log(shares)` steadily decreases as
+the predictor increases, then there is a negative relationship. If there
+is no clear pattern in the mean/median of `log(shares)` as the predictor
+increases, then we cannot make any statement about the linear
+relationship of that predictor and the response. For example,
+`title_subjectivity` has a range \[0, 1\]. Let’s see how the mean/median
+of `log(shares)` changes as `title_subjectivity` increases:
 
 ``` r
 tab <- world_news_data %>%
@@ -239,7 +313,7 @@ knitr::kable(tab,
 ```
 
 | Title Subjectivity |  Mean | Median | Count |
-|:-------------------|------:|-------:|------:|
+| :----------------- | ----: | -----: | ----: |
 | (-0.05,0.05\]      | 7.588 |  7.378 |   997 |
 | (0.05,0.15\]       | 7.695 |  7.438 |    82 |
 | (0.15,0.25\]       | 7.529 |  7.550 |    69 |
@@ -273,7 +347,7 @@ knitr::kable(tab,
 ```
 
 | Rate Negative Words |  Mean | Median | Count |
-|:--------------------|------:|-------:|------:|
+| :------------------ | ----: | -----: | ----: |
 | (-0.05,0.05\]       | 7.597 |  7.313 |    74 |
 | (0.05,0.15\]        | 7.509 |  7.378 |   271 |
 | (0.15,0.25\]        | 7.664 |  7.496 |   681 |
@@ -307,7 +381,7 @@ knitr::kable(tab,
 ```
 
 | Avg Positive Polarity |  Mean | Median | Count |
-|:----------------------|------:|-------:|------:|
+| :-------------------- | ----: | -----: | ----: |
 | \[0,0.1)              | 8.343 |  8.243 |    23 |
 | \[0.1,0.2)            | 7.879 |  8.039 |    15 |
 | \[0.2,0.3)            | 7.546 |  7.313 |   215 |
@@ -350,7 +424,8 @@ with more images or videos would be shared less often.
 ggplot(world_news_data, aes(x = num_imgs, y = log(shares))) +
   geom_point() + 
   geom_smooth(method="lm") +
-  labs(title="Scatterplot of Number of Images vs log(shares)")
+  labs(title="Scatterplot of Number of Images vs log(shares)",
+       x="Number of Images")
 ```
 
 ![](BusAnalysis_files/figure-gfm/Joey%20EDA%20img%20video-1.png)<!-- -->
@@ -360,7 +435,8 @@ ggplot(world_news_data, aes(x = num_imgs, y = log(shares))) +
 ggplot(world_news_data, aes(x = num_videos, y = log(shares))) +
   geom_point() + 
   geom_smooth(method="lm") +
-  labs(title="Scatterplot of Number of Videos vs log(shares)")
+  labs(title="Scatterplot of Number of Videos vs log(shares)",
+       x="Number of Videos")
 ```
 
 ![](BusAnalysis_files/figure-gfm/Joey%20EDA%20img%20video-2.png)<!-- -->
@@ -629,10 +705,9 @@ and fit decision trees to each of the bootstrapped samples. When
 selecting a split point, the learning algorithm selects a random sample
 of predictors of which to search, instead of all the predictors. By not
 looking at all the predictors every time, it prevents one or two strong
-predictors to dominate the tree fits.  
-The prediction of trees are then averaged (for regression) to get the
-final predicted value. This would lead to less variance and better fit
-over an individual tree fit.
+predictors to dominate the tree fits. The prediction of trees are then
+averaged (for regression) to get the final predicted value. This would
+lead to less variance and better fit over an individual tree fit.
 
 Regarding the number of predictors to look for, a good rule of thumb is
 m = sqrt(p) for classification and m=p/3 for regression, where m is the
@@ -663,26 +738,26 @@ create a better fitting model is called boosting. It’s analogous to the
 proverb “None of us is as smart as all of us.”
 
 The first step in creating a boosted tree model is fitting a single
-decision tree with *d* splits to the data. We evaluate this fit using a
-loss function, a method of measuring prediction error. There are many
+decision tree with \(d\) splits to the data. We evaluate this fit using
+a loss function, a method of measuring prediction error. There are many
 different loss functions and its selection is arbitrary. Step 2 is to
-add a second decision tree (also with *d* splits) to the first such that
-it lowers the loss compared to the first tree alone:
+add a second decision tree (also with \(d\) splits) to the first such
+that it lowers the loss compared to the first tree alone:
 
-*B**o**o**s**t**e**d**E**n**s**e**m**b**l**e* = *F**i**r**s**t**T**r**e**e* + *λ* \* *S**e**c**o**n**d**T**r**e**e*
+\[Boosted Ensemble = First Tree + \lambda * Second Tree\]
 
-*L**o**s**s*(*B**o**o**s**t**e**d**E**n**s**e**m**b**l**e*) &lt; *L**o**s**s*(*F**i**r**s**t**T**r**e**e*)
+\[Loss(Boosted Ensemble) < Loss(First Tree)\]
 
-Here, *λ* is a shrinkage parameter which slows the fitting process. It’s
-sometimes called the learning rate. We repeat the second step *B* times
-to finish building the model. The tuning parameters *λ*, *d*, and *B*
-can be chosen using cross validation.
+Here, \(\lambda\) is a shrinkage parameter which slows the fitting
+process. It’s sometimes called the learning rate. We repeat the second
+step \(B\) times to finish building the model. The tuning parameters
+\(\lambda\), \(d\), and \(B\) can be chosen using cross validation.
 
 In the R code below which uses the `caret` package to build a boosted
-tree model, `n.trees` is *B*, `interaction.depth` is *d*, and
-`shrinkage` is *λ*. The additional tuning parameter `n.minobsinnode`
-allows for controlling the minimum number of observations within each
-tree node.
+tree model, `n.trees` is \(B\), `interaction.depth` is \(d\), and
+`shrinkage` is \(\lambda\). The additional tuning parameter
+`n.minobsinnode` allows for controlling the minimum number of
+observations within each tree node.
 
 ``` r
 control <- trainControl(method = "cv", number = 5)
@@ -697,10 +772,10 @@ boostedFit <- train(log(shares) ~ ., data = world_news_train,
                     verbose = FALSE)
 ```
 
-## Model Evaluation
+# Model Evaluation
 
 We can compare the RMSE, Rsquared, and MAE of the four model fits on the
-test data.
+test data. We will be choosing the model with the lowest RMSE.
 
 ``` r
 prediction <- predict(lm1Fit, newdata = world_news_test)
@@ -723,21 +798,18 @@ names(compareFits) <- c("Linear Model 1",
 
 compareFitsLong <- data.frame(t(compareFits))
 
+# Sort the table of models by ascending RMSE and pick the first row as the model
+finalModel <- compareFitsLong %>% arrange(RMSE) %>% filter(row_number()==1) 
+
 knitr::kable(compareFitsLong)
 ```
 
 |                     |   RMSE | Rsquared |    MAE |
-|:--------------------|-------:|---------:|-------:|
+| :------------------ | -----: | -------: | -----: |
 | Linear Model 1      | 0.9310 |   0.0532 | 0.7149 |
 | Linear Model 2      | 0.9333 |   0.0445 | 0.7146 |
 | Random Forest Model | 0.9291 |   0.0543 | 0.7123 |
 | Boosted Tree Model  | 0.9458 |   0.0209 | 0.7190 |
 
-We will choose the model with the lowest RMSE.
-
-``` r
-# Sort the table of models by ascending RMSE and pick the first row as the model
-finalModel <- compareFitsLong %>% arrange(RMSE) %>% filter(row_number()==1) 
-```
-
-### Our final model is the Random Forest Model. When we fit the model on the test data we get RMSE=0.9291, Rsquared=0.0543, and MAE=0.7123.
+Our final model is the Random Forest Model. When we fit the model on the
+test data we get RMSE=0.9291, Rsquared=0.0543, and MAE=0.7123.
