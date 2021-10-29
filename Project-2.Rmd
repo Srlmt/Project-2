@@ -157,9 +157,15 @@ world_news_data2 <- world_news_data %>%
                     filter(value == 1) %>%
                     select(-value)
 
+world_news_data2$day_published <- factor(world_news_data2$day_published,
+                                         levels=c("monday", "tuesday", 
+                                                  "wednesday", "thursday", 
+                                                  "friday", "saturday", 
+                                                  "sunday"))
+
 ggplot(world_news_data2, aes(x = day_published, y = log(shares))) +
   geom_boxplot(aes(fill = day_published)) +
-  stat_summary(fun.y = "mean") +
+  stat_summary(fun = "mean") +
   theme(legend.position = "none") +
   labs(x = "Day of Publication", 
        title = "Log(Shares) by Day of Publication")
