@@ -5,7 +5,7 @@ Joey Chen and John Williams
 
 # Purpose
 
-...
+The purpose of this project is to use automation to show different predictive model fitting using linear regression models and the ensemble tree-based models. We use the [Online News Popularity Dataset](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity) to try to predict the number of shares with numerous predictors. And We separate the analysis by six different data channels by using automation in R Markdown. 
 
 # Required Packages
 
@@ -26,6 +26,8 @@ The following packages are required for this project:
   - The analysis for [World articles is available here](WorldAnalysis.md)
 
 # Render Code
+
+The following code is used in `renderProject.Rmd` file to automate and render documents from different channels. 
 
 ``` r
 # Description: This program renders Project-2 and outputs the documents
