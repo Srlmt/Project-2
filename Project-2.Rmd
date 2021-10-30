@@ -1,5 +1,5 @@
 ---
-title: "Example Using `r str_to_title(params[[1]])` Channel Data"
+title: "Example Using `r str_to_title(params[[1]][[1]])` Channel Data"
 author: "Joey Chen and John Williams"
 date: "10/24/2021"
 ---
@@ -40,7 +40,7 @@ news_data <- read_csv("./OnlineNewsPopularity.csv")
 channel_data <- news_data %>% 
                    # automation to subset data by data channel
                    filter(eval(parse(text = paste0("data_channel_is_", 
-                                                   params[[1]]))) == 1) %>%
+                                                   params[[1]][[1]]))) == 1) %>%
                    # remove data channel variables
                    select(-starts_with("data_channel_is")) %>%
                    # remove non-predictive variables
