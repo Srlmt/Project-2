@@ -1,4 +1,4 @@
-Project 2
+Project 2 - Predictive Modeling and Automation
 ================
 Joey Chen and John Williams
 10/28/2021
