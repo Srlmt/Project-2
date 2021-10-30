@@ -1,5 +1,5 @@
 ---
-title: "Project 2"
+title: "Example Using `r str_to_title(params[[1]])` Channel Data"
 author: "Joey Chen and John Williams"
 date: "10/24/2021"
 ---
@@ -120,6 +120,7 @@ log_shares_summary <- channel_data %>% summarise(Min. = min(log(shares)),
 
 knitr::kable(log_shares_summary, digits=3, caption="Numeric Summary of log(Shares)")
 ```
+
 In addition to the histograms, we can see that the coefficient of variation (CV) is much larger in `shares` compared to `log(shares)`. This can make `shares` harder to predict since the variability is so high. So we will continue to do EDA using `log(shares)` and will fit the models on `log(shares)` since that can also help reduce the impact of some extreme values of `shares`.  
 
 ## Log(shares) by Number of Words in the Title
@@ -166,12 +167,12 @@ ggplot(channel_data, aes(x = as.factor(n_tokens_title), y = log(shares))) +
 Let's create a categorical variable `day_published` and determine if the mean/median number of shares changes depending on what day the article was published: 
 
 ```{r John EDA1}
-world_news_data2 <- channel_data %>%
-                    pivot_longer(starts_with("weekday"), 
-                                 names_to = "day_published",
-                                 names_prefix = "weekday_is_") %>%
-                    filter(value == 1) %>%
-                    select(-value)
+channel_data2 <- channel_data %>%
+                 pivot_longer(starts_with("weekday"), 
+                              names_to = "day_published",
+                              names_prefix = "weekday_is_") %>%
+                 filter(value == 1) %>%
+                 select(-value)
 
 channel_data2$day_published <- factor(channel_data2$day_published,
                                       levels=c("monday", "tuesday", "wednesday",

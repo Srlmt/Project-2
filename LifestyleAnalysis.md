@@ -1,6 +1,4 @@
-Project 2 - Predictive Modeling and Automation  
 Example Using Lifestyle Channel Data
-
 ================
 Joey Chen and John Williams
 10/24/2021
