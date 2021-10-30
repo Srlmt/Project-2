@@ -1,36 +1,36 @@
-Project 2
+Project 2 - Predictive Modeling and Automation
 ================
 Joey Chen and John Williams
 10/24/2021
 
-  - [Introduction](#introduction)
-  - [Data Preparation](#data-preparation)
-  - [Exploratory Data Analysis](#exploratory-data-analysis)
-      - [Distribution of Response
+-   [Introduction](#introduction)
+-   [Data Preparation](#data-preparation)
+-   [Exploratory Data Analysis](#exploratory-data-analysis)
+    -   [Distribution of Response
         Variable](#distribution-of-response-variable)
-      - [Log(shares) by Number of Words in the
+    -   [Log(shares) by Number of Words in the
         Title](#logshares-by-number-of-words-in-the-title)
-      - [Log(shares) by Day of Week](#logshares-by-day-of-week)
-      - [Summary by Interval](#summary-by-interval)
-      - [Log(shares) by Number of
+    -   [Log(shares) by Day of Week](#logshares-by-day-of-week)
+    -   [Summary by Interval](#summary-by-interval)
+    -   [Log(shares) by Number of
         Keywords](#logshares-by-number-of-keywords)
-      - [Log(shares) by Number of Images and
+    -   [Log(shares) by Number of Images and
         Videos](#logshares-by-number-of-images-and-videos)
-      - [Correlation of Predictors](#correlation-of-predictors)
-  - [Model Selection](#model-selection)
-      - [Linear Model \#1](#linear-model-1)
-      - [Linear Model \#2](#linear-model-2)
-      - [Random Forest Model](#random-forest-model)
-      - [Boosted Tree Model](#boosted-tree-model)
-  - [Model Evaluation](#model-evaluation)
+    -   [Correlation of Predictors](#correlation-of-predictors)
+-   [Model Selection](#model-selection)
+    -   [Linear Model \#1](#linear-model-1)
+    -   [Linear Model \#2](#linear-model-2)
+    -   [Random Forest Model](#random-forest-model)
+    -   [Boosted Tree Model](#boosted-tree-model)
+-   [Model Evaluation](#model-evaluation)
 
 # Introduction
 
 This project is a simple walk-through of these steps of the data science
 process:
 
-> Data Preparation –\> Exploratory Data Analysis –\> Model Selection –\>
-> Model Evaluation
+> Data Preparation –&gt; Exploratory Data Analysis –&gt; Model Selection
+> –&gt; Model Evaluation
 
 We’ll be using the `OnlineNewsPopularity` dataset from the [UC Irvine
 Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/).
@@ -67,7 +67,7 @@ removing non-predictive variables:
 news_data <- read_csv("./OnlineNewsPopularity.csv")
 
 # data cleaning
-world_news_data <- news_data %>% 
+channel_data <- news_data %>% 
                    # automation to subset data by data channel
                    filter(eval(parse(text = paste0("data_channel_is_", 
                                                    params[[1]]))) == 1) %>%
@@ -83,11 +83,11 @@ a Training Set and Test Set:
 ``` r
 set.seed(31415)
 
-partition <- createDataPartition(y = world_news_data$shares, 
+partition <- createDataPartition(y = channel_data$shares, 
                                  p= 0.7, 
                                  list = FALSE)
-world_news_train <- world_news_data[partition,]
-world_news_test <- world_news_data[-partition,]
+channel_train <- channel_data[partition,]
+channel_test <- channel_data[-partition,]
 ```
 
 # Exploratory Data Analysis
@@ -99,7 +99,7 @@ First, we can take a look at the distribution of our response variable
 
 ``` r
 # Histogram of shares
-ggplot(world_news_data, aes(x=shares)) +
+ggplot(channel_data, aes(x=shares)) +
   geom_histogram(bins=50, fill="navy", col="darkgreen") +
   labs(title="Histogram of shares")
 ```
@@ -112,7 +112,7 @@ we can look at the distribution of `shares` under 5,000.
 
 ``` r
 # Histogram of shares < 5000
-ggplot(filter(world_news_data, shares < 5000), aes(x=shares)) +
+ggplot(filter(channel_data, shares < 5000), aes(x=shares)) +
   geom_histogram(bins=50, fill="navy", col="darkgreen") +
   labs(title="Histogram of shares under 5000")
 ```
@@ -124,7 +124,7 @@ want to look at the distribution of `log(shares)`.
 
 ``` r
 # Histogram of log(shares) 
-ggplot(world_news_data, aes(x=log(shares))) +
+ggplot(channel_data, aes(x=log(shares))) +
   geom_histogram(bins=50, fill="navy", col="darkgreen") +
   labs(title="Histogram of log(shares)")
 ```
@@ -139,40 +139,40 @@ We can also look at the numeric summary of `shares` vs `log(shares)`.
 
 ``` r
 # Numeric summary of shares
-shares_summary <- world_news_data %>% summarise(Min. = min(shares),
-                                                Q1 = quantile(shares, 0.25),
-                                                Median = median(shares),
-                                                Mean = mean(shares),
-                                                SD = sd(shares),
-                                                Q3 = quantile(shares, 0.75),
-                                                Max = max(shares),
-                                                CV = scales::percent(SD / Mean))
+shares_summary <- channel_data %>% summarise(Min. = min(shares),
+                                             Q1 = quantile(shares, 0.25),
+                                             Median = median(shares),
+                                             Mean = mean(shares),
+                                             SD = sd(shares),
+                                             Q3 = quantile(shares, 0.75),
+                                             Max = max(shares),
+                                             CV = scales::percent(SD / Mean))
 
 knitr::kable(shares_summary, digits=0, caption = "Numeric Summary of Shares")
 ```
 
 | Min. |   Q1 | Median | Mean |   SD |   Q3 |    Max | CV   |
-| ---: | ---: | -----: | ---: | ---: | ---: | -----: | :--- |
+|-----:|-----:|-------:|-----:|-----:|-----:|-------:|:-----|
 |   28 | 1100 |   1700 | 3682 | 8885 | 3250 | 208300 | 241% |
 
 Numeric Summary of Shares
 
 ``` r
 # Numeric summary of log(shares)
-log_shares_summary <- world_news_data %>% summarise(Min. = min(log(shares)),
-                                                Q1 = quantile(log(shares), 0.25),
-                                                Median = median(log(shares)),
-                                                Mean = mean(log(shares)),
-                                                SD = sd(log(shares)),
-                                                Q3 = quantile(log(shares), 0.75),
-                                                Max = max(log(shares)),
-                                                CV = scales::percent(SD / Mean))
+log_shares_summary <- channel_data %>% summarise(Min. = min(log(shares)),
+                                                 Q1 = quantile(log(shares), 0.25),
+                                                 Median = median(log(shares)),
+                                                 Mean = mean(log(shares)),
+                                                 SD = sd(log(shares)),
+                                                 Q3 = quantile(log(shares), 0.75),
+                                                 Max = max(log(shares)),
+                                                 CV = scales::percent(SD / Mean))
 
 knitr::kable(log_shares_summary, digits=3, caption="Numeric Summary of log(Shares)")
 ```
 
 |  Min. |    Q1 | Median |  Mean |    SD |    Q3 |    Max | CV  |
-| ----: | ----: | -----: | ----: | ----: | ----: | -----: | :-- |
+|------:|------:|-------:|------:|------:|------:|-------:|:----|
 | 3.332 | 7.003 |  7.438 | 7.606 | 0.943 | 8.086 | 12.247 | 12% |
 
 Numeric Summary of log(Shares)
@@ -192,7 +192,7 @@ word count. We can see which title word counts are used the most within
 this data.
 
 ``` r
-ggplot(data=world_news_data, aes(x=n_tokens_title)) +
+ggplot(data=channel_data, aes(x=n_tokens_title)) +
   geom_bar(col="darkblue", fill="darkgreen") +
   labs(title="Bar graph of Number of Words in Title",
        x="Number of Words in the Title")
@@ -204,7 +204,7 @@ Here is the numerical summary. We can see which title word count has the
 highest mean or median log(shares).
 
 ``` r
-words_title_summary <- world_news_data %>% 
+words_title_summary <- channel_data %>% 
   group_by("Title Word Count" = n_tokens_title) %>% 
   summarise(n=length(log(shares)),
             Min. = min(log(shares)),
@@ -219,7 +219,7 @@ knitr::kable(words_title_summary, digit=2, caption="Summary Log(shares) by Numbe
 ```
 
 | Title Word Count |   n | Min. |   Q1 | Median | Mean |   SD |   Q3 |   Max |
-| ---------------: | --: | ---: | ---: | -----: | ---: | ---: | ---: | ----: |
+|-----------------:|----:|-----:|-----:|-------:|-----:|-----:|-----:|------:|
 |                3 |   1 | 7.00 | 7.00 |   7.00 | 7.00 |   NA | 7.00 |  7.00 |
 |                5 |   7 | 6.41 | 6.89 |   7.44 | 7.58 | 1.08 | 7.88 |  9.67 |
 |                6 |  46 | 4.84 | 6.83 |   7.44 | 7.35 | 0.91 | 7.73 |  9.99 |
@@ -245,7 +245,7 @@ of words in title. However, the mean can be heavily influenced by
 outliers.
 
 ``` r
-ggplot(world_news_data, aes(x = as.factor(n_tokens_title), y = log(shares))) +
+ggplot(channel_data, aes(x = as.factor(n_tokens_title), y = log(shares))) +
   geom_boxplot(aes(fill=as.factor(n_tokens_title))) +
   stat_summary(fun.y="mean", col="red") +
   theme(legend.position = "none") +
@@ -262,20 +262,19 @@ mean/median number of shares changes depending on what day the article
 was published:
 
 ``` r
-world_news_data2 <- world_news_data %>%
-                    pivot_longer(starts_with("weekday"), 
-                                 names_to = "day_published",
-                                 names_prefix = "weekday_is_") %>%
-                    filter(value == 1) %>%
-                    select(-value)
+channel_data2 <- channel_data %>%
+                 pivot_longer(starts_with("weekday"), 
+                              names_to = "day_published",
+                              names_prefix = "weekday_is_") %>%
+                 filter(value == 1) %>%
+                 select(-value)
 
-world_news_data2$day_published <- factor(world_news_data2$day_published,
-                                         levels=c("monday", "tuesday", 
-                                                  "wednesday", "thursday", 
-                                                  "friday", "saturday", 
-                                                  "sunday"))
+channel_data2$day_published <- factor(channel_data2$day_published,
+                                      levels=c("monday", "tuesday", "wednesday",
+                                               "thursday", "friday", "saturday",
+                                               "sunday"))
 
-ggplot(world_news_data2, aes(x = day_published, y = log(shares))) +
+ggplot(channel_data2, aes(x = day_published, y = log(shares))) +
   geom_boxplot(aes(fill = day_published)) +
   stat_summary(fun = "mean") +
   theme(legend.position = "none") +
@@ -295,7 +294,7 @@ We can further see evidence of this by examining the categorical
 variable `is_weekend`:
 
 ``` r
-ggplot(world_news_data, aes(x = as.factor(is_weekend), y = log(shares))) +
+ggplot(channel_data, aes(x = as.factor(is_weekend), y = log(shares))) +
   geom_boxplot(aes(fill = as.factor(is_weekend))) +
   theme(legend.position = "none") +
   labs(x = "Published on Weekend?  0 = No, 1 = Yes", 
@@ -308,20 +307,20 @@ ggplot(world_news_data, aes(x = as.factor(is_weekend), y = log(shares))) +
 
 Let’s examine the relationship between a continuous variable that is
 within the range \[0, 1\] and `log(shares)`. One way we can do this by
-“cutting” the variable into 11 subintervals ((-0.5, 0.5\], (0.5,
-1.5\], (1.5, 2.5\], etc.) and calculating the mean/median `log(shares)`
-for each subinterval. If the mean/median of `log(shares)` steadily
-increases as the predictor increases, then there is a positive
-relationship; if the mean/median of `log(shares)` steadily decreases as
-the predictor increases, then there is a negative relationship. If there
-is no clear pattern in the mean/median of `log(shares)` as the predictor
-increases, then we cannot make any statement about the linear
-relationship of that predictor and the response. For example,
-`title_subjectivity` has a range \[0, 1\]. Let’s see how the mean/median
-of `log(shares)` changes as `title_subjectivity` increases:
+“cutting” the variable into 11 subintervals ((-0.5, 0.5\], (0.5, 1.5\],
+(1.5, 2.5\], etc.) and calculating the mean/median `log(shares)` for
+each subinterval. If the mean/median of `log(shares)` steadily increases
+as the predictor increases, then there is a positive relationship; if
+the mean/median of `log(shares)` steadily decreases as the predictor
+increases, then there is a negative relationship. If there is no clear
+pattern in the mean/median of `log(shares)` as the predictor increases,
+then we cannot make any statement about the linear relationship of that
+predictor and the response. For example, `title_subjectivity` has a
+range \[0, 1\]. Let’s see how the mean/median of `log(shares)` changes
+as `title_subjectivity` increases:
 
 ``` r
-tab <- world_news_data %>%
+tab <- channel_data %>%
        mutate(title_subjectivity = cut(title_subjectivity, 
                                        seq(-0.05, 1.05, by = 0.1))) %>%
        group_by(title_subjectivity) %>%
@@ -337,7 +336,7 @@ knitr::kable(tab,
 ```
 
 | Title Subjectivity |  Mean | Median | Count |
-| :----------------- | ----: | -----: | ----: |
+|:-------------------|------:|-------:|------:|
 | (-0.05,0.05\]      | 7.588 |  7.378 |   997 |
 | (0.05,0.15\]       | 7.695 |  7.438 |    82 |
 | (0.15,0.25\]       | 7.529 |  7.550 |    69 |
@@ -355,7 +354,7 @@ Summary of Title Subjectivity
 Similarly, we can examine `rate_negative_words`:
 
 ``` r
-tab <- world_news_data %>%
+tab <- channel_data %>%
        mutate(rate_negative_words = cut(rate_negative_words, 
                                         seq(-0.05, 1.05, by = 0.1))) %>%
        group_by(rate_negative_words) %>%
@@ -371,7 +370,7 @@ knitr::kable(tab,
 ```
 
 | Rate Negative Words |  Mean | Median | Count |
-| :------------------ | ----: | -----: | ----: |
+|:--------------------|------:|-------:|------:|
 | (-0.05,0.05\]       | 7.597 |  7.313 |    74 |
 | (0.05,0.15\]        | 7.509 |  7.378 |   271 |
 | (0.15,0.25\]        | 7.664 |  7.496 |   681 |
@@ -389,7 +388,7 @@ Summary of Rate Negative Words
 And `avg_positive_polarity`:
 
 ``` r
-tab <- world_news_data %>%
+tab <- channel_data %>%
        mutate(avg_positive_polarity = cut(avg_positive_polarity, 
                                           seq(0, 1, by = 0.1), right = F)) %>%
        group_by(avg_positive_polarity) %>%
@@ -405,7 +404,7 @@ knitr::kable(tab,
 ```
 
 | Avg Positive Polarity |  Mean | Median | Count |
-| :-------------------- | ----: | -----: | ----: |
+|:----------------------|------:|-------:|------:|
 | \[0,0.1)              | 8.343 |  8.243 |    23 |
 | \[0.1,0.2)            | 7.879 |  8.039 |    15 |
 | \[0.2,0.3)            | 7.546 |  7.313 |   215 |
@@ -425,7 +424,7 @@ create a boxplot. The boxplot will show us if any particular number of
 keywords is related to higher number of shares.
 
 ``` r
-ggplot(world_news_data, aes(x = as.factor(num_keywords), y = log(shares))) +
+ggplot(channel_data, aes(x = as.factor(num_keywords), y = log(shares))) +
   geom_boxplot(aes(fill=as.factor(num_keywords))) +
   stat_summary(fun.y = "mean") +
   theme(legend.position = "none") +
@@ -445,7 +444,7 @@ with more images or videos would be shared less often.
 
 ``` r
 # Scatterplot of num_img and log(shares)
-ggplot(world_news_data, aes(x = num_imgs, y = log(shares))) +
+ggplot(channel_data, aes(x = num_imgs, y = log(shares))) +
   geom_point() + 
   geom_smooth(method="lm") +
   labs(title="Scatterplot of Number of Images vs log(shares)",
@@ -456,7 +455,7 @@ ggplot(world_news_data, aes(x = num_imgs, y = log(shares))) +
 
 ``` r
 # Scatterplot of num_videos and log(shares)
-ggplot(world_news_data, aes(x = num_videos, y = log(shares))) +
+ggplot(channel_data, aes(x = num_videos, y = log(shares))) +
   geom_point() + 
   geom_smooth(method="lm") +
   labs(title="Scatterplot of Number of Videos vs log(shares)",
@@ -472,14 +471,14 @@ strong and 0.8-1 as very strong correlation.
 
 ``` r
 # Correlation Coefficient (r) of num_imgs vs log(shares) 
-cor(x = world_news_data$num_imgs, y = log(world_news_data$shares))
+cor(x = channel_data$num_imgs, y = log(channel_data$shares))
 ```
 
     ## [1] 0.1431437
 
 ``` r
 # Correlation Coefficient (r) of num_videos vs log(shares) 
-cor(x = world_news_data$num_videos, y = log(world_news_data$shares))
+cor(x = channel_data$num_videos, y = log(channel_data$shares))
 ```
 
     ## [1] 0.03591697
@@ -495,7 +494,7 @@ similar attributes.
 ``` r
 # Create a correlogram for predictors that measure attributes of "tokens" 
 # and "words"
-cor1 <- world_news_data %>% select(contains("tokens"), contains("words"))
+cor1 <- channel_data %>% select(contains("tokens"), contains("words"))
 cormatrix <- round(cor(cor1), 2)
 corrplot(cormatrix, type = "upper", order = "hclust", 
          tl.col = "black", tl.srt = 45)
@@ -505,7 +504,7 @@ corrplot(cormatrix, type = "upper", order = "hclust",
 
 ``` r
 # Create a correlogram for predictors that measure attributes of keywords 
-cor2 <- world_news_data %>% select(contains("keywords"), contains("kw"))
+cor2 <- channel_data %>% select(contains("keywords"), contains("kw"))
 cormatrix <- round(cor(cor2), 2)
 corrplot(cormatrix, type = "upper", order = "hclust", 
          tl.col = "black", tl.srt = 45)
@@ -516,7 +515,7 @@ corrplot(cormatrix, type = "upper", order = "hclust",
 ``` r
 # Create a correlogram for predictors that measure attributes of "positve" and
 # "negative" connotation 
-cor3 <- world_news_data %>% select(contains("positive"), contains("negative"))
+cor3 <- channel_data %>% select(contains("positive"), contains("negative"))
 cormatrix <- round(cor(cor3), 2)
 corrplot(cormatrix, type = "upper", order = "hclust", 
          tl.col = "black", tl.srt = 45)
@@ -526,7 +525,7 @@ corrplot(cormatrix, type = "upper", order = "hclust",
 
 ``` r
 # Create a correlogram for predictors that measure attributes of article titles
-cor4 <- world_news_data %>% select(contains("title"))
+cor4 <- channel_data %>% select(contains("title"))
 cormatrix <- round(cor(cor4), 2)
 corrplot(cormatrix, type = "upper", order = "hclust", 
          tl.col = "black", tl.srt = 45)
@@ -588,7 +587,7 @@ lm1Fit <- lm(log(shares) ~ n_non_stop_words +
                      num_hrefs:num_imgs +
                      kw_min_min:weekday_is_tuesday +
                      n_tokens_title:num_imgs,
-            data = world_news_train)
+            data = channel_train)
 
 summary(lm1Fit)
 ```
@@ -604,7 +603,7 @@ summary(lm1Fit)
     ##     I(average_token_length^2) + I(kw_min_avg^2) + I(kw_avg_avg^2) + 
     ##     I(self_reference_avg_sharess^2) + I(title_sentiment_polarity^2) + 
     ##     num_hrefs:num_imgs + kw_min_min:weekday_is_tuesday + n_tokens_title:num_imgs, 
-    ##     data = world_news_train)
+    ##     data = channel_train)
     ## 
     ## Residuals:
     ##     Min      1Q  Median      3Q     Max 
@@ -678,7 +677,7 @@ the code below for building Linear Model \#2.
 
 ``` r
 # Remove variables with possible colinearity
-reduced_world_news_data <- world_news_data %>%
+reduced_world_news_data <- channel_data %>%
                            select(n_tokens_title,
                                   n_tokens_content,
                                   num_hrefs,
@@ -768,7 +767,7 @@ using m = 17.
 ``` r
 # Fit the random forest Model
 rfFit <- train(log(shares) ~ .,
-               data = world_news_train,
+               data = channel_train,
                method = "rf",
                trControl = trainControl(method = "cv", number = 5),
                preProcess = c("center", "scale"),
@@ -788,30 +787,30 @@ create a better fitting model is called boosting. It’s analogous to the
 proverb “None of us is as smart as all of us.”
 
 The first step in creating a boosted tree model is fitting a single
-decision tree with \(d\) splits to the data. We evaluate this fit using
-a loss function, a method of measuring prediction error. There are many
+decision tree with *d* splits to the data. We evaluate this fit using a
+loss function, a method of measuring prediction error. There are many
 different loss functions and its selection is arbitrary. Step 2 is to
-add a second decision tree (also with \(d\) splits) to the first such
-that it lowers the loss compared to the first tree alone:
+add a second decision tree (also with *d* splits) to the first such that
+it lowers the loss compared to the first tree alone:
 
-\[Boosted Ensemble = First Tree + \lambda * Second Tree\]
+*B**o**o**s**t**e**d**E**n**s**e**m**b**l**e* = *F**i**r**s**t**T**r**e**e* + *λ* \* *S**e**c**o**n**d**T**r**e**e*
 
-\[Loss(Boosted Ensemble) < Loss(First Tree)\]
+*L**o**s**s*(*B**o**o**s**t**e**d**E**n**s**e**m**b**l**e*) &lt; *L**o**s**s*(*F**i**r**s**t**T**r**e**e*)
 
-Here, \(\lambda\) is a shrinkage parameter which slows the fitting
-process. It’s sometimes called the learning rate. We repeat the second
-step \(B\) times to finish building the model. The tuning parameters
-\(\lambda\), \(d\), and \(B\) can be chosen using cross validation.
+Here, *λ* is a shrinkage parameter which slows the fitting process. It’s
+sometimes called the learning rate. We repeat the second step *B* times
+to finish building the model. The tuning parameters *λ*, *d*, and *B*
+can be chosen using cross validation.
 
 In the R code below which uses the `caret` package to build a boosted
-tree model, `n.trees` is \(B\), `interaction.depth` is \(d\), and
-`shrinkage` is \(\lambda\). The additional tuning parameter
-`n.minobsinnode` allows for controlling the minimum number of
-observations within each tree node.
+tree model, `n.trees` is *B*, `interaction.depth` is *d*, and
+`shrinkage` is *λ*. The additional tuning parameter `n.minobsinnode`
+allows for controlling the minimum number of observations within each
+tree node.
 
 ``` r
 control <- trainControl(method = "cv", number = 5)
-boostedFit <- train(log(shares) ~ ., data = world_news_train, 
+boostedFit <- train(log(shares) ~ ., data = channel_train, 
                     method = "gbm",
                     trControl = control,
                     preProcess = c("center", "scale"),
@@ -828,17 +827,17 @@ We can compare the RMSE, Rsquared, and MAE of the four model fits on the
 test data. We will be choosing the model with the lowest RMSE.
 
 ``` r
-prediction <- predict(lm1Fit, newdata = world_news_test)
-lm1 <- round(postResample(prediction, log(world_news_test$shares)), 4)
+prediction <- predict(lm1Fit, newdata = channel_test)
+lm1 <- round(postResample(prediction, log(channel_test$shares)), 4)
 
-prediction <- predict(lm2Fit, newdata = world_news_test)
-lm2 <- round(postResample(prediction, log(world_news_test$shares)), 4)
+prediction <- predict(lm2Fit, newdata = channel_test)
+lm2 <- round(postResample(prediction, log(channel_test$shares)), 4)
 
-prediction <- predict(rfFit, newdata = world_news_test)
-rf <- round(postResample(prediction, log(world_news_test$shares)), 4)
+prediction <- predict(rfFit, newdata = channel_test)
+rf <- round(postResample(prediction, log(channel_test$shares)), 4)
 
-prediction <- predict(boostedFit, newdata = world_news_test)
-boost <- round(postResample(prediction, log(world_news_test$shares)), 4)
+prediction <- predict(boostedFit, newdata = channel_test)
+boost <- round(postResample(prediction, log(channel_test$shares)), 4)
 
 compareFits <- data.frame(lm1, lm2, rf, boost)
 names(compareFits) <- c("Linear Model 1", 
@@ -855,7 +854,7 @@ knitr::kable(compareFitsLong)
 ```
 
 |                     |   RMSE | Rsquared |    MAE |
-| :------------------ | -----: | -------: | -----: |
+|:--------------------|-------:|---------:|-------:|
 | Linear Model 1      | 0.9310 |   0.0532 | 0.7149 |
 | Linear Model 2      | 0.9333 |   0.0445 | 0.7146 |
 | Random Forest Model | 0.9291 |   0.0543 | 0.7123 |
