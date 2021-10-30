@@ -3,34 +3,34 @@ Project 2
 Joey Chen and John Williams
 10/24/2021
 
--   [Introduction](#introduction)
--   [Data Preparation](#data-preparation)
--   [Exploratory Data Analysis](#exploratory-data-analysis)
-    -   [Distribution of Response
+  - [Introduction](#introduction)
+  - [Data Preparation](#data-preparation)
+  - [Exploratory Data Analysis](#exploratory-data-analysis)
+      - [Distribution of Response
         Variable](#distribution-of-response-variable)
-    -   [Log(shares) by Number of Words in the
+      - [Log(shares) by Number of Words in the
         Title](#logshares-by-number-of-words-in-the-title)
-    -   [Log(shares) by Day of Week](#logshares-by-day-of-week)
-    -   [Summary by Interval](#summary-by-interval)
-    -   [Log(shares) by Number of
+      - [Log(shares) by Day of Week](#logshares-by-day-of-week)
+      - [Summary by Interval](#summary-by-interval)
+      - [Log(shares) by Number of
         Keywords](#logshares-by-number-of-keywords)
-    -   [Log(shares) by Number of Images and
+      - [Log(shares) by Number of Images and
         Videos](#logshares-by-number-of-images-and-videos)
-    -   [Correlation of Predictors](#correlation-of-predictors)
--   [Model Selection](#model-selection)
-    -   [Linear Model \#1](#linear-model-1)
-    -   [Linear Model \#2](#linear-model-2)
-    -   [Random Forest Model](#random-forest-model)
-    -   [Boosted Tree Model](#boosted-tree-model)
--   [Model Evaluation](#model-evaluation)
+      - [Correlation of Predictors](#correlation-of-predictors)
+  - [Model Selection](#model-selection)
+      - [Linear Model \#1](#linear-model-1)
+      - [Linear Model \#2](#linear-model-2)
+      - [Random Forest Model](#random-forest-model)
+      - [Boosted Tree Model](#boosted-tree-model)
+  - [Model Evaluation](#model-evaluation)
 
 # Introduction
 
 This project is a simple walk-through of these steps of the data science
 process:
 
-> Data Preparation –&gt; Exploratory Data Analysis –&gt; Model Selection
-> –&gt; Model Evaluation
+> Data Preparation –\> Exploratory Data Analysis –\> Model Selection –\>
+> Model Evaluation
 
 We’ll be using the `OnlineNewsPopularity` dataset from the [UC Irvine
 Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/).
@@ -152,7 +152,7 @@ knitr::kable(shares_summary, digits=0, caption = "Numeric Summary of Shares")
 ```
 
 | Min. |   Q1 | Median | Mean |   SD |   Q3 |    Max | CV   |
-|-----:|-----:|-------:|-----:|-----:|-----:|-------:|:-----|
+| ---: | ---: | -----: | ---: | ---: | ---: | -----: | :--- |
 |   28 | 1100 |   1700 | 3682 | 8885 | 3250 | 208300 | 241% |
 
 Numeric Summary of Shares
@@ -172,7 +172,7 @@ knitr::kable(log_shares_summary, digits=3, caption="Numeric Summary of log(Share
 ```
 
 |  Min. |    Q1 | Median |  Mean |    SD |    Q3 |    Max | CV  |
-|------:|------:|-------:|------:|------:|------:|-------:|:----|
+| ----: | ----: | -----: | ----: | ----: | ----: | -----: | :-- |
 | 3.332 | 7.003 |  7.438 | 7.606 | 0.943 | 8.086 | 12.247 | 12% |
 
 Numeric Summary of log(Shares)
@@ -204,20 +204,22 @@ Here is the numerical summary. We can see which title word count has the
 highest mean or median log(shares).
 
 ``` r
-words_title_summary <- world_news_data %>% group_by("Title Word Count" = n_tokens_title) %>% summarise(n=length(log(shares)),
-                                                Min. = min(log(shares)),
-                                                Q1 = quantile(log(shares), 0.25),
-                                                Median = median(log(shares)),
-                                                Mean = mean(log(shares)),
-                                                SD = sd(log(shares)),
-                                                Q3 = quantile(log(shares), 0.75),
-                                                Max = max(log(shares)))
+words_title_summary <- world_news_data %>% 
+  group_by("Title Word Count" = n_tokens_title) %>% 
+  summarise(n=length(log(shares)),
+            Min. = min(log(shares)),
+            Q1 = quantile(log(shares), 0.25),
+            Median = median(log(shares)),
+            Mean = mean(log(shares)),
+            SD = sd(log(shares)),
+            Q3 = quantile(log(shares), 0.75),
+            Max = max(log(shares)))
 
 knitr::kable(words_title_summary, digit=2, caption="Summary Log(shares) by Number of Words in the Title")
 ```
 
 | Title Word Count |   n | Min. |   Q1 | Median | Mean |   SD |   Q3 |   Max |
-|-----------------:|----:|-----:|-----:|-------:|-----:|-----:|-----:|------:|
+| ---------------: | --: | ---: | ---: | -----: | ---: | ---: | ---: | ----: |
 |                3 |   1 | 7.00 | 7.00 |   7.00 | 7.00 |   NA | 7.00 |  7.00 |
 |                5 |   7 | 6.41 | 6.89 |   7.44 | 7.58 | 1.08 | 7.88 |  9.67 |
 |                6 |  46 | 4.84 | 6.83 |   7.44 | 7.35 | 0.91 | 7.73 |  9.99 |
@@ -306,17 +308,17 @@ ggplot(world_news_data, aes(x = as.factor(is_weekend), y = log(shares))) +
 
 Let’s examine the relationship between a continuous variable that is
 within the range \[0, 1\] and `log(shares)`. One way we can do this by
-“cutting” the variable into 11 subintervals ((-0.5, 0.5\], (0.5, 1.5\],
-(1.5, 2.5\], etc.) and calculating the mean/median `log(shares)` for
-each subinterval. If the mean/median of `log(shares)` steadily increases
-as the predictor increases, then there is a positive relationship; if
-the mean/median of `log(shares)` steadily decreases as the predictor
-increases, then there is a negative relationship. If there is no clear
-pattern in the mean/median of `log(shares)` as the predictor increases,
-then we cannot make any statement about the linear relationship of that
-predictor and the response. For example, `title_subjectivity` has a
-range \[0, 1\]. Let’s see how the mean/median of `log(shares)` changes
-as `title_subjectivity` increases:
+“cutting” the variable into 11 subintervals ((-0.5, 0.5\], (0.5,
+1.5\], (1.5, 2.5\], etc.) and calculating the mean/median `log(shares)`
+for each subinterval. If the mean/median of `log(shares)` steadily
+increases as the predictor increases, then there is a positive
+relationship; if the mean/median of `log(shares)` steadily decreases as
+the predictor increases, then there is a negative relationship. If there
+is no clear pattern in the mean/median of `log(shares)` as the predictor
+increases, then we cannot make any statement about the linear
+relationship of that predictor and the response. For example,
+`title_subjectivity` has a range \[0, 1\]. Let’s see how the mean/median
+of `log(shares)` changes as `title_subjectivity` increases:
 
 ``` r
 tab <- world_news_data %>%
@@ -335,7 +337,7 @@ knitr::kable(tab,
 ```
 
 | Title Subjectivity |  Mean | Median | Count |
-|:-------------------|------:|-------:|------:|
+| :----------------- | ----: | -----: | ----: |
 | (-0.05,0.05\]      | 7.588 |  7.378 |   997 |
 | (0.05,0.15\]       | 7.695 |  7.438 |    82 |
 | (0.15,0.25\]       | 7.529 |  7.550 |    69 |
@@ -369,7 +371,7 @@ knitr::kable(tab,
 ```
 
 | Rate Negative Words |  Mean | Median | Count |
-|:--------------------|------:|-------:|------:|
+| :------------------ | ----: | -----: | ----: |
 | (-0.05,0.05\]       | 7.597 |  7.313 |    74 |
 | (0.05,0.15\]        | 7.509 |  7.378 |   271 |
 | (0.15,0.25\]        | 7.664 |  7.496 |   681 |
@@ -403,7 +405,7 @@ knitr::kable(tab,
 ```
 
 | Avg Positive Polarity |  Mean | Median | Count |
-|:----------------------|------:|-------:|------:|
+| :-------------------- | ----: | -----: | ----: |
 | \[0,0.1)              | 8.343 |  8.243 |    23 |
 | \[0.1,0.2)            | 7.879 |  8.039 |    15 |
 | \[0.2,0.3)            | 7.546 |  7.313 |   215 |
@@ -544,6 +546,17 @@ coefficients can be used to make predictions on the response with
 predictor variables from the test data.
 
 ## Linear Model \#1
+
+The predictors in this model are selected by finding the statistically
+significant variables when using the world news data channel. First, all
+52 predictors are fit against `log(shares)` to test for the main effect,
+and 19 predictors had significant main effect and these variables are
+kept. Next, these 19 variables as well as their squares are fit to test
+for quadratic effect, with 7 quadratic predictors being significant and
+kept. Lastly, 19 main effect predictors and all their first order
+interactions are fit to test for interaction effect, with 3 significant
+interaction effects kept. The result is a model with 19 main effect
+predictors, 7 quadratic predictors, and 3 interaction predictors.
 
 ``` r
 lm1Fit <- lm(log(shares) ~ n_non_stop_words + 
@@ -775,26 +788,26 @@ create a better fitting model is called boosting. It’s analogous to the
 proverb “None of us is as smart as all of us.”
 
 The first step in creating a boosted tree model is fitting a single
-decision tree with *d* splits to the data. We evaluate this fit using a
-loss function, a method of measuring prediction error. There are many
+decision tree with \(d\) splits to the data. We evaluate this fit using
+a loss function, a method of measuring prediction error. There are many
 different loss functions and its selection is arbitrary. Step 2 is to
-add a second decision tree (also with *d* splits) to the first such that
-it lowers the loss compared to the first tree alone:
+add a second decision tree (also with \(d\) splits) to the first such
+that it lowers the loss compared to the first tree alone:
 
-*B**o**o**s**t**e**d**E**n**s**e**m**b**l**e* = *F**i**r**s**t**T**r**e**e* + *λ* \* *S**e**c**o**n**d**T**r**e**e*
+\[Boosted Ensemble = First Tree + \lambda * Second Tree\]
 
-*L**o**s**s*(*B**o**o**s**t**e**d**E**n**s**e**m**b**l**e*) &lt; *L**o**s**s*(*F**i**r**s**t**T**r**e**e*)
+\[Loss(Boosted Ensemble) < Loss(First Tree)\]
 
-Here, *λ* is a shrinkage parameter which slows the fitting process. It’s
-sometimes called the learning rate. We repeat the second step *B* times
-to finish building the model. The tuning parameters *λ*, *d*, and *B*
-can be chosen using cross validation.
+Here, \(\lambda\) is a shrinkage parameter which slows the fitting
+process. It’s sometimes called the learning rate. We repeat the second
+step \(B\) times to finish building the model. The tuning parameters
+\(\lambda\), \(d\), and \(B\) can be chosen using cross validation.
 
 In the R code below which uses the `caret` package to build a boosted
-tree model, `n.trees` is *B*, `interaction.depth` is *d*, and
-`shrinkage` is *λ*. The additional tuning parameter `n.minobsinnode`
-allows for controlling the minimum number of observations within each
-tree node.
+tree model, `n.trees` is \(B\), `interaction.depth` is \(d\), and
+`shrinkage` is \(\lambda\). The additional tuning parameter
+`n.minobsinnode` allows for controlling the minimum number of
+observations within each tree node.
 
 ``` r
 control <- trainControl(method = "cv", number = 5)
@@ -842,7 +855,7 @@ knitr::kable(compareFitsLong)
 ```
 
 |                     |   RMSE | Rsquared |    MAE |
-|:--------------------|-------:|---------:|-------:|
+| :------------------ | -----: | -------: | -----: |
 | Linear Model 1      | 0.9310 |   0.0532 | 0.7149 |
 | Linear Model 2      | 0.9333 |   0.0445 | 0.7146 |
 | Random Forest Model | 0.9291 |   0.0543 | 0.7123 |

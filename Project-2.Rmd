@@ -136,14 +136,16 @@ ggplot(data=world_news_data, aes(x=n_tokens_title)) +
 Here is the numerical summary. We can see which title word count has the highest mean or median log(shares). 
 
 ```{r Joey EDA Title Words summary}
-words_title_summary <- world_news_data %>% group_by("Title Word Count" = n_tokens_title) %>% summarise(n=length(log(shares)),
-                                                Min. = min(log(shares)),
-                                                Q1 = quantile(log(shares), 0.25),
-                                                Median = median(log(shares)),
-                                                Mean = mean(log(shares)),
-                                                SD = sd(log(shares)),
-                                                Q3 = quantile(log(shares), 0.75),
-                                                Max = max(log(shares)))
+words_title_summary <- world_news_data %>% 
+  group_by("Title Word Count" = n_tokens_title) %>% 
+  summarise(n=length(log(shares)),
+            Min. = min(log(shares)),
+            Q1 = quantile(log(shares), 0.25),
+            Median = median(log(shares)),
+            Mean = mean(log(shares)),
+            SD = sd(log(shares)),
+            Q3 = quantile(log(shares), 0.75),
+            Max = max(log(shares)))
 
 knitr::kable(words_title_summary, digit=2, caption="Summary Log(shares) by Number of Words in the Title")
 ```
@@ -334,6 +336,8 @@ corrplot(cormatrix, type = "upper", order = "hclust",
 Linear regression models a response variable as a linear combination of input predictor variables. The models are often fitted using the least squares approach, which is a method that finds the best fit by minimizing the sum of the squares of the residuals of the points from the curve. When we fit the model on the training data we would get coefficients corresponding to each of the predictor variables, and these coefficients can be used to make predictions on the response with predictor variables from the test data.
   
 ## Linear Model #1
+
+The predictors in this model are selected by finding the statistically significant variables when using the world news data channel. First, all 52 predictors are fit against `log(shares)` to test for the main effect, and 19 predictors had significant main effect and these variables are kept. Next, these 19 variables as well as their squares are fit to test for quadratic effect, with 7 quadratic predictors being significant and kept. Lastly, 19 main effect predictors and all their first order interactions are fit to test for interaction effect, with 3 significant interaction effects kept. The result is a model with 19 main effect predictors, 7 quadratic predictors, and 3 interaction predictors.  
 
 ```{r Joey Linear Model 1}
 lm1Fit <- lm(log(shares) ~ n_non_stop_words + 
