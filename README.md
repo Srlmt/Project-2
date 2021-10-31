@@ -42,16 +42,18 @@ channels <- c("lifestyle", "entertainment", "bus", "socmed", "tech", "world")
 output_file <- paste0(str_to_title(channels), "Analysis.md")
 
 # Create a list for each channel with just the channel name parameter
-params = lapply(channels, FUN = function(x){list(channel = x)})
+param = lapply(channels, FUN = function(x){list(channel = x)})
 
 # Put into a data frame 
-reports <- tibble(output_file, params)
+reports <- tibble(output_file, param)
 
 apply(reports, MARGIN = 1, FUN = function(x){
+  # Assign variable to be used as title for each report
+  params = x[[2]]
+  
   rmarkdown::render(input = "Project-2.Rmd", 
                     output_format = "github_document", 
                     output_file = x[[1]],
-                    params = x[[2]],
                     output_options = list(
                       html_preview = FALSE,
                       toc = TRUE,
