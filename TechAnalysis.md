@@ -1,36 +1,36 @@
-Example Using Lifestyle Channel Data
+Example Using Tech Channel Data
 ================
 Joey Chen and John Williams
 10/24/2021
 
--   [Introduction](#introduction)
--   [Data Preparation](#data-preparation)
--   [Exploratory Data Analysis](#exploratory-data-analysis)
-    -   [Distribution of Response
+  - [Introduction](#introduction)
+  - [Data Preparation](#data-preparation)
+  - [Exploratory Data Analysis](#exploratory-data-analysis)
+      - [Distribution of Response
         Variable](#distribution-of-response-variable)
-    -   [Log(shares) by Number of Words in the
+      - [Log(shares) by Number of Words in the
         Title](#logshares-by-number-of-words-in-the-title)
-    -   [Log(shares) by Day of Week](#logshares-by-day-of-week)
-    -   [Summary by Interval](#summary-by-interval)
-    -   [Log(shares) by Number of
+      - [Log(shares) by Day of Week](#logshares-by-day-of-week)
+      - [Summary by Interval](#summary-by-interval)
+      - [Log(shares) by Number of
         Keywords](#logshares-by-number-of-keywords)
-    -   [Log(shares) by Number of Images and
+      - [Log(shares) by Number of Images and
         Videos](#logshares-by-number-of-images-and-videos)
-    -   [Correlation of Predictors](#correlation-of-predictors)
--   [Model Selection](#model-selection)
-    -   [Linear Model \#1](#linear-model-1)
-    -   [Linear Model \#2](#linear-model-2)
-    -   [Random Forest Model](#random-forest-model)
-    -   [Boosted Tree Model](#boosted-tree-model)
--   [Model Evaluation](#model-evaluation)
+      - [Correlation of Predictors](#correlation-of-predictors)
+  - [Model Selection](#model-selection)
+      - [Linear Model \#1](#linear-model-1)
+      - [Linear Model \#2](#linear-model-2)
+      - [Random Forest Model](#random-forest-model)
+      - [Boosted Tree Model](#boosted-tree-model)
+  - [Model Evaluation](#model-evaluation)
 
 # Introduction
 
 This project is a simple walk-through of these steps of the data science
 process:
 
-> Data Preparation –&gt; Exploratory Data Analysis –&gt; Model Selection
-> –&gt; Model Evaluation
+> Data Preparation –\> Exploratory Data Analysis –\> Model Selection –\>
+> Model Evaluation
 
 We’ll be using the `OnlineNewsPopularity` dataset from the [UC Irvine
 Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/).
@@ -152,8 +152,8 @@ knitr::kable(shares_summary, digits=0, caption = "Numeric Summary of Shares")
 ```
 
 | Min. |   Q1 | Median | Mean |   SD |   Q3 |    Max | CV   |
-|-----:|-----:|-------:|-----:|-----:|-----:|-------:|:-----|
-|   28 | 1100 |   1700 | 3682 | 8885 | 3250 | 208300 | 241% |
+| ---: | ---: | -----: | ---: | ---: | ---: | -----: | :--- |
+|   36 | 1100 |   1700 | 3072 | 9024 | 3000 | 663600 | 294% |
 
 Numeric Summary of Shares
 
@@ -172,8 +172,8 @@ knitr::kable(log_shares_summary, digits=3, caption="Numeric Summary of log(Share
 ```
 
 |  Min. |    Q1 | Median |  Mean |    SD |    Q3 |    Max | CV  |
-|------:|------:|-------:|------:|------:|------:|-------:|:----|
-| 3.332 | 7.003 |  7.438 | 7.606 | 0.943 | 8.086 | 12.247 | 12% |
+| ----: | ----: | -----: | ----: | ----: | ----: | -----: | :-- |
+| 3.584 | 7.003 |  7.438 | 7.581 | 0.812 | 8.006 | 13.405 | 11% |
 
 Numeric Summary of log(Shares)
 
@@ -218,23 +218,25 @@ words_title_summary <- channel_data %>%
 knitr::kable(words_title_summary, digit=2, caption="Summary Log(shares) by Number of Words in the Title")
 ```
 
-| Title Word Count |   n | Min. |   Q1 | Median | Mean |   SD |   Q3 |   Max |
-|-----------------:|----:|-----:|-----:|-------:|-----:|-----:|-----:|------:|
-|                3 |   1 | 7.00 | 7.00 |   7.00 | 7.00 |   NA | 7.00 |  7.00 |
-|                5 |   7 | 6.41 | 6.89 |   7.44 | 7.58 | 1.08 | 7.88 |  9.67 |
-|                6 |  46 | 4.84 | 6.83 |   7.44 | 7.35 | 0.91 | 7.73 |  9.99 |
-|                7 | 161 | 5.04 | 7.00 |   7.31 | 7.51 | 0.91 | 8.01 |  9.91 |
-|                8 | 351 | 4.53 | 7.00 |   7.44 | 7.58 | 0.97 | 8.01 | 10.93 |
-|                9 | 432 | 5.06 | 7.00 |   7.50 | 7.70 | 1.01 | 8.19 | 12.25 |
-|               10 | 399 | 5.95 | 7.00 |   7.38 | 7.58 | 0.84 | 8.02 | 10.38 |
-|               11 | 335 | 3.33 | 7.00 |   7.44 | 7.62 | 0.96 | 8.16 | 11.30 |
-|               12 | 183 | 5.19 | 7.00 |   7.44 | 7.62 | 0.92 | 7.99 | 10.91 |
-|               13 | 121 | 4.36 | 7.00 |   7.38 | 7.60 | 1.01 | 8.22 | 10.90 |
-|               14 |  42 | 6.10 | 6.93 |   7.49 | 7.69 | 0.97 | 8.33 | 10.18 |
-|               15 |  12 | 6.56 | 7.04 |   7.24 | 7.45 | 0.77 | 7.56 |  9.13 |
-|               16 |   5 | 6.28 | 6.77 |   7.44 | 7.22 | 0.68 | 7.70 |  7.90 |
-|               17 |   3 | 6.46 | 7.00 |   7.55 | 7.34 | 0.79 | 7.78 |  8.01 |
-|               18 |   1 | 7.17 | 7.17 |   7.17 | 7.17 |   NA | 7.17 |  7.17 |
+| Title Word Count |    n | Min. |   Q1 | Median | Mean |   SD |   Q3 |   Max |
+| ---------------: | ---: | ---: | ---: | -----: | ---: | ---: | ---: | ----: |
+|                4 |    4 | 6.73 | 7.00 |   7.44 | 7.75 | 1.18 | 8.18 |  9.38 |
+|                5 |   41 | 6.62 | 7.17 |   7.60 | 7.73 | 0.82 | 8.07 |  9.81 |
+|                6 |  198 | 5.30 | 7.24 |   7.65 | 7.76 | 0.92 | 8.24 | 11.16 |
+|                7 |  474 | 5.10 | 7.00 |   7.50 | 7.60 | 0.83 | 8.04 | 10.53 |
+|                8 |  858 | 4.41 | 7.00 |   7.44 | 7.62 | 0.84 | 8.04 | 10.92 |
+|                9 | 1242 | 4.16 | 7.00 |   7.44 | 7.59 | 0.85 | 8.01 | 11.55 |
+|               10 | 1362 | 4.52 | 7.00 |   7.44 | 7.57 | 0.78 | 8.01 | 10.84 |
+|               11 | 1238 | 4.78 | 7.00 |   7.44 | 7.57 | 0.78 | 8.01 | 11.18 |
+|               12 |  922 | 5.93 | 7.00 |   7.38 | 7.55 | 0.77 | 7.90 | 11.12 |
+|               13 |  559 | 5.33 | 6.91 |   7.38 | 7.52 | 0.80 | 7.97 | 13.41 |
+|               14 |  281 | 3.58 | 7.00 |   7.44 | 7.60 | 0.89 | 8.13 | 10.78 |
+|               15 |  114 | 6.32 | 7.00 |   7.28 | 7.46 | 0.70 | 7.73 | 10.60 |
+|               16 |   26 | 6.52 | 6.82 |   7.35 | 7.56 | 0.89 | 8.15 |  9.69 |
+|               17 |   19 | 6.38 | 7.21 |   7.55 | 7.86 | 1.17 | 8.05 | 10.88 |
+|               18 |    6 | 6.65 | 7.23 |   7.97 | 7.81 | 0.84 | 8.31 |  8.88 |
+|               19 |    1 | 7.31 | 7.31 |   7.31 | 7.31 |   NA | 7.31 |  7.31 |
+|               20 |    1 | 7.60 | 7.60 |   7.60 | 7.60 |   NA | 7.60 |  7.60 |
 
 Summary Log(shares) by Number of Words in the Title
 
@@ -307,17 +309,17 @@ ggplot(channel_data, aes(x = as.factor(is_weekend), y = log(shares))) +
 
 Let’s examine the relationship between a continuous variable that is
 within the range \[0, 1\] and `log(shares)`. One way we can do this by
-“cutting” the variable into 11 subintervals ((-0.5, 0.5\], (0.5, 1.5\],
-(1.5, 2.5\], etc.) and calculating the mean/median `log(shares)` for
-each subinterval. If the mean/median of `log(shares)` steadily increases
-as the predictor increases, then there is a positive relationship; if
-the mean/median of `log(shares)` steadily decreases as the predictor
-increases, then there is a negative relationship. If there is no clear
-pattern in the mean/median of `log(shares)` as the predictor increases,
-then we cannot make any statement about the linear relationship of that
-predictor and the response. For example, `title_subjectivity` has a
-range \[0, 1\]. Let’s see how the mean/median of `log(shares)` changes
-as `title_subjectivity` increases:
+“cutting” the variable into 11 subintervals ((-0.5, 0.5\], (0.5,
+1.5\], (1.5, 2.5\], etc.) and calculating the mean/median `log(shares)`
+for each subinterval. If the mean/median of `log(shares)` steadily
+increases as the predictor increases, then there is a positive
+relationship; if the mean/median of `log(shares)` steadily decreases as
+the predictor increases, then there is a negative relationship. If there
+is no clear pattern in the mean/median of `log(shares)` as the predictor
+increases, then we cannot make any statement about the linear
+relationship of that predictor and the response. For example,
+`title_subjectivity` has a range \[0, 1\]. Let’s see how the mean/median
+of `log(shares)` changes as `title_subjectivity` increases:
 
 ``` r
 tab <- channel_data %>%
@@ -336,18 +338,18 @@ knitr::kable(tab,
 ```
 
 | Title Subjectivity |  Mean | Median | Count |
-|:-------------------|------:|-------:|------:|
-| (-0.05,0.05\]      | 7.588 |  7.378 |   997 |
-| (0.05,0.15\]       | 7.695 |  7.438 |    82 |
-| (0.15,0.25\]       | 7.529 |  7.550 |    69 |
-| (0.25,0.35\]       | 7.659 |  7.523 |   130 |
-| (0.35,0.45\]       | 7.527 |  7.378 |    92 |
-| (0.45,0.55\]       | 7.554 |  7.378 |   268 |
-| (0.55,0.65\]       | 7.674 |  7.438 |   119 |
-| (0.65,0.75\]       | 7.603 |  7.438 |   118 |
-| (0.75,0.85\]       | 7.634 |  7.496 |    45 |
-| (0.85,0.95\]       | 8.016 |  7.901 |    41 |
-| (0.95,1.05\]       | 7.635 |  7.378 |   138 |
+| :----------------- | ----: | -----: | ----: |
+| (-0.05,0.05\]      | 7.565 |  7.438 | 3,654 |
+| (0.05,0.15\]       | 7.599 |  7.496 |   300 |
+| (0.15,0.25\]       | 7.546 |  7.438 |   246 |
+| (0.25,0.35\]       | 7.690 |  7.550 |   480 |
+| (0.35,0.45\]       | 7.476 |  7.378 |   518 |
+| (0.45,0.55\]       | 7.562 |  7.438 |   974 |
+| (0.55,0.65\]       | 7.623 |  7.496 |   319 |
+| (0.65,0.75\]       | 7.615 |  7.438 |   239 |
+| (0.75,0.85\]       | 7.624 |  7.438 |   143 |
+| (0.85,0.95\]       | 7.718 |  7.496 |   131 |
+| (0.95,1.05\]       | 7.693 |  7.550 |   342 |
 
 Summary of Title Subjectivity
 
@@ -370,18 +372,18 @@ knitr::kable(tab,
 ```
 
 | Rate Negative Words |  Mean | Median | Count |
-|:--------------------|------:|-------:|------:|
-| (-0.05,0.05\]       | 7.597 |  7.313 |    74 |
-| (0.05,0.15\]        | 7.509 |  7.378 |   271 |
-| (0.15,0.25\]        | 7.664 |  7.496 |   681 |
-| (0.25,0.35\]        | 7.584 |  7.438 |   626 |
-| (0.35,0.45\]        | 7.591 |  7.438 |   278 |
-| (0.45,0.55\]        | 7.608 |  7.313 |   109 |
-| (0.55,0.65\]        | 7.694 |  7.438 |    39 |
-| (0.65,0.75\]        | 7.722 |  7.601 |    18 |
-| (0.75,0.85\]        | 8.006 |  8.006 |     1 |
-| (0.85,0.95\]        | 6.417 |  6.417 |     1 |
-| (0.95,1.05\]        | 7.550 |  7.550 |     1 |
+| :------------------ | ----: | -----: | ----: |
+| (-0.05,0.05\]       | 7.444 |  7.313 |   413 |
+| (0.05,0.15\]        | 7.539 |  7.378 | 1,082 |
+| (0.15,0.25\]        | 7.578 |  7.438 | 2,493 |
+| (0.25,0.35\]        | 7.615 |  7.496 | 1,933 |
+| (0.35,0.45\]        | 7.623 |  7.438 |   962 |
+| (0.45,0.55\]        | 7.606 |  7.438 |   325 |
+| (0.55,0.65\]        | 7.531 |  7.438 |    87 |
+| (0.65,0.75\]        | 7.627 |  7.467 |    38 |
+| (0.75,0.85\]        | 7.761 |  8.055 |     6 |
+| (0.85,0.95\]        | 7.741 |  7.741 |     1 |
+| (0.95,1.05\]        | 7.436 |  7.431 |     6 |
 
 Summary of Rate Negative Words
 
@@ -404,15 +406,18 @@ knitr::kable(tab,
 ```
 
 | Avg Positive Polarity |  Mean | Median | Count |
-|:----------------------|------:|-------:|------:|
-| \[0,0.1)              | 8.343 |  8.243 |    23 |
-| \[0.1,0.2)            | 7.879 |  8.039 |    15 |
-| \[0.2,0.3)            | 7.546 |  7.313 |   215 |
-| \[0.3,0.4)            | 7.576 |  7.378 |   964 |
-| \[0.4,0.5)            | 7.631 |  7.438 |   748 |
-| \[0.5,0.6)            | 7.641 |  7.496 |   121 |
-| \[0.6,0.7)            | 7.366 |  7.242 |    12 |
-| \[0.7,0.8)            | 7.378 |  7.378 |     1 |
+| :-------------------- | ----: | -----: | ----: |
+| \[0,0.1)              | 7.774 |  7.550 |    29 |
+| \[0.1,0.2)            | 7.504 |  7.378 |   109 |
+| \[0.2,0.3)            | 7.538 |  7.378 | 1,259 |
+| \[0.3,0.4)            | 7.596 |  7.438 | 4,056 |
+| \[0.4,0.5)            | 7.581 |  7.438 | 1,677 |
+| \[0.5,0.6)            | 7.572 |  7.438 |   187 |
+| \[0.6,0.7)            | 7.538 |  7.345 |    20 |
+| \[0.7,0.8)            | 7.942 |  8.368 |     4 |
+| \[0.8,0.9)            | 8.304 |  8.243 |     3 |
+| \[0.9,1)              | 7.313 |  7.313 |     1 |
+| NA                    | 7.003 |  7.003 |     1 |
 
 Summary of Average Positive Polarity
 
@@ -474,14 +479,14 @@ strong and 0.8-1 as very strong correlation.
 cor(x = channel_data$num_imgs, y = log(channel_data$shares))
 ```
 
-    ## [1] 0.1431437
+    ## [1] 0.03183185
 
 ``` r
 # Correlation Coefficient (r) of num_videos vs log(shares) 
 cor(x = channel_data$num_videos, y = log(channel_data$shares))
 ```
 
-    ## [1] 0.03591697
+    ## [1] 0.05358556
 
 ## Correlation of Predictors
 
@@ -607,46 +612,46 @@ summary(lm1Fit)
     ## 
     ## Residuals:
     ##     Min      1Q  Median      3Q     Max 
-    ## -3.0187 -0.5918 -0.1748  0.4554  4.2887 
+    ## -4.0822 -0.5145 -0.1254  0.3992  5.7186 
     ## 
     ## Coefficients:
     ##                                   Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)                      7.978e+00  2.982e-01  26.751  < 2e-16 ***
-    ## n_non_stop_words                -5.313e+00  4.680e+00  -1.135  0.25652    
-    ## num_hrefs                        2.446e-03  2.796e-03   0.875  0.38182    
-    ## num_imgs                        -2.069e-02  1.904e-02  -1.087  0.27723    
-    ## num_videos                       6.103e-02  2.783e-02   2.193  0.02846 *  
-    ## average_token_length             1.969e+00  1.991e+00   0.989  0.32300    
-    ## kw_min_min                       1.054e-03  3.529e-04   2.986  0.00288 ** 
-    ## kw_min_avg                      -5.833e-05  7.268e-05  -0.802  0.42240    
-    ## kw_max_avg                      -2.236e-05  8.505e-06  -2.629  0.00865 ** 
-    ## kw_avg_avg                       1.626e-04  5.772e-05   2.818  0.00490 ** 
-    ## self_reference_avg_sharess       6.125e-06  2.626e-06   2.332  0.01983 *  
-    ## weekday_is_monday               -1.582e-01  8.354e-02  -1.894  0.05839 .  
-    ## weekday_is_tuesday              -1.947e-01  9.064e-02  -2.148  0.03185 *  
-    ## weekday_is_wednesday            -2.069e-01  8.129e-02  -2.545  0.01103 *  
-    ## weekday_is_thursday             -1.833e-01  8.254e-02  -2.220  0.02654 *  
-    ## weekday_is_friday               -2.683e-01  8.732e-02  -3.072  0.00216 ** 
-    ## LDA_00                           6.348e-02  9.698e-02   0.655  0.51283    
-    ## LDA_02                          -2.536e-01  2.325e-01  -1.091  0.27557    
-    ## global_subjectivity             -9.324e-02  3.146e-01  -0.296  0.76701    
-    ## title_sentiment_polarity        -2.128e-01  9.978e-02  -2.132  0.03314 *  
-    ## I(n_tokens_title^2)             -2.493e-04  7.319e-04  -0.341  0.73347    
-    ## I(num_videos^2)                 -2.487e-03  1.532e-03  -1.623  0.10478    
-    ## I(average_token_length^2)       -2.092e-01  2.118e-01  -0.987  0.32363    
-    ## I(kw_min_avg^2)                  9.521e-09  2.434e-08   0.391  0.69566    
-    ## I(kw_avg_avg^2)                  2.587e-09  3.548e-09   0.729  0.46595    
-    ## I(self_reference_avg_sharess^2) -1.522e-11  9.232e-12  -1.648  0.09948 .  
-    ## I(title_sentiment_polarity^2)    1.133e-01  1.378e-01   0.822  0.41135    
-    ## num_hrefs:num_imgs               5.811e-05  1.711e-04   0.340  0.73414    
-    ## kw_min_min:weekday_is_tuesday   -1.623e-03  7.832e-04  -2.072  0.03842 *  
-    ## num_imgs:n_tokens_title          2.959e-03  1.820e-03   1.625  0.10429    
+    ## (Intercept)                      7.157e+00  2.204e-01  32.473  < 2e-16 ***
+    ## n_non_stop_words                -4.695e+00  2.427e+00  -1.935 0.053090 .  
+    ## num_hrefs                        9.283e-03  1.783e-03   5.207 1.99e-07 ***
+    ## num_imgs                         2.887e-02  8.153e-03   3.542 0.000401 ***
+    ## num_videos                       5.838e-02  1.134e-02   5.147 2.74e-07 ***
+    ## average_token_length             1.887e+00  1.048e+00   1.799 0.072014 .  
+    ## kw_min_min                       1.264e-03  1.707e-04   7.402 1.56e-13 ***
+    ## kw_min_avg                      -2.796e-04  3.737e-05  -7.481 8.64e-14 ***
+    ## kw_max_avg                      -3.333e-05  7.064e-06  -4.718 2.44e-06 ***
+    ## kw_avg_avg                       4.128e-04  3.661e-05  11.276  < 2e-16 ***
+    ## self_reference_avg_sharess       3.284e-06  8.657e-07   3.794 0.000150 ***
+    ## weekday_is_monday               -2.545e-01  4.100e-02  -6.206 5.86e-10 ***
+    ## weekday_is_tuesday              -2.729e-01  4.068e-02  -6.709 2.17e-11 ***
+    ## weekday_is_wednesday            -2.496e-01  3.966e-02  -6.292 3.39e-10 ***
+    ## weekday_is_thursday             -2.827e-01  4.012e-02  -7.048 2.05e-12 ***
+    ## weekday_is_friday               -1.973e-01  4.264e-02  -4.627 3.80e-06 ***
+    ## LDA_00                           2.948e-02  9.863e-02   0.299 0.765052    
+    ## LDA_02                           9.040e-02  7.860e-02   1.150 0.250191    
+    ## global_subjectivity              7.301e-02  1.559e-01   0.468 0.639516    
+    ## title_sentiment_polarity         2.976e-02  5.654e-02   0.526 0.598661    
+    ## I(n_tokens_title^2)              3.040e-04  2.916e-04   1.042 0.297244    
+    ## I(num_videos^2)                 -1.094e-03  2.147e-04  -5.093 3.64e-07 ***
+    ## I(average_token_length^2)       -2.089e-01  1.135e-01  -1.842 0.065587 .  
+    ## I(kw_min_avg^2)                  9.156e-08  1.486e-08   6.162 7.72e-10 ***
+    ## I(kw_avg_avg^2)                 -8.943e-09  3.377e-09  -2.648 0.008115 ** 
+    ## I(self_reference_avg_sharess^2) -5.305e-12  1.561e-12  -3.399 0.000682 ***
+    ## I(title_sentiment_polarity^2)    1.965e-01  8.594e-02   2.287 0.022240 *  
+    ## num_hrefs:num_imgs              -1.746e-04  1.095e-04  -1.595 0.110824    
+    ## kw_min_min:weekday_is_tuesday   -1.894e-04  3.822e-04  -0.496 0.620249    
+    ## num_imgs:n_tokens_title         -2.338e-03  7.562e-04  -3.091 0.002005 ** 
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
-    ## Residual standard error: 0.908 on 1442 degrees of freedom
-    ## Multiple R-squared:  0.08101,    Adjusted R-squared:  0.06253 
-    ## F-statistic: 4.383 on 29 and 1442 DF,  p-value: 1.55e-13
+    ## Residual standard error: 0.7758 on 5115 degrees of freedom
+    ## Multiple R-squared:  0.09694,    Adjusted R-squared:  0.09182 
+    ## F-statistic: 18.93 on 29 and 5115 DF,  p-value: < 2.2e-16
 
 ## Linear Model \#2
 
@@ -714,37 +719,37 @@ summary(lm2Fit)
     ## 
     ## Residuals:
     ##     Min      1Q  Median      3Q     Max 
-    ## -4.1816 -0.6124 -0.1779  0.4673  4.5221 
+    ## -3.8318 -0.5305 -0.1443  0.4198  5.3615 
     ## 
     ## Coefficients:
     ##                                            Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)                               7.284e+00  9.989e-01   7.292 4.32e-13 ***
-    ## n_tokens_title                            6.162e-02  9.449e-02   0.652  0.51440    
-    ## n_tokens_content                          1.119e-04  5.084e-05   2.201  0.02782 *  
-    ## num_hrefs                                 3.641e-03  2.319e-03   1.570  0.11649    
-    ## num_imgs                                  2.942e-02  2.037e-02   1.444  0.14880    
-    ## num_videos                                1.562e-02  1.062e-02   1.471  0.14137    
-    ## num_keywords                              1.738e-03  1.428e-02   0.122  0.90316    
-    ## average_token_length                      1.174e-01  2.496e-01   0.470  0.63810    
-    ## is_weekend                                2.581e-01  5.392e-02   4.786 1.83e-06 ***
-    ## global_subjectivity                      -5.401e-02  3.002e-01  -0.180  0.85721    
-    ## global_sentiment_polarity                -1.282e+00  1.894e+00  -0.677  0.49855    
-    ## title_sentiment_polarity                 -1.091e-01  7.259e-02  -1.502  0.13314    
-    ## self_reference_avg_sharess                4.004e-06  1.344e-06   2.979  0.00292 ** 
-    ## rate_positive_words                      -4.545e-01  1.274e+00  -0.357  0.72120    
-    ## n_tokens_title:average_token_length      -2.017e-02  2.413e-02  -0.836  0.40320    
-    ## n_tokens_title:global_sentiment_polarity  1.268e-01  1.884e-01   0.673  0.50096    
-    ## n_tokens_title:rate_positive_words        2.595e-02  1.276e-01   0.203  0.83889    
-    ## n_tokens_content:num_imgs                -1.327e-06  1.094e-06  -1.212  0.22547    
-    ## num_imgs:num_keywords                    -3.126e-04  1.976e-03  -0.158  0.87436    
-    ## num_imgs:global_subjectivity             -7.809e-03  2.611e-02  -0.299  0.76489    
-    ## num_imgs:global_sentiment_polarity       -4.771e-02  3.034e-02  -1.572  0.11603    
+    ## (Intercept)                               8.793e+00  6.542e-01  13.442  < 2e-16 ***
+    ## n_tokens_title                           -9.064e-02  6.101e-02  -1.486 0.137405    
+    ## n_tokens_content                          1.546e-04  2.933e-05   5.271 1.39e-07 ***
+    ## num_hrefs                                 6.912e-03  1.363e-03   5.071 4.04e-07 ***
+    ## num_imgs                                 -2.442e-02  1.188e-02  -2.055 0.039956 *  
+    ## num_videos                                2.232e-02  6.022e-03   3.707 0.000211 ***
+    ## num_keywords                             -2.370e-02  6.510e-03  -3.641 0.000273 ***
+    ## average_token_length                     -4.110e-01  1.422e-01  -2.890 0.003866 ** 
+    ## is_weekend                                3.025e-01  2.834e-02  10.676  < 2e-16 ***
+    ## global_subjectivity                       2.818e-01  1.515e-01   1.860 0.062968 .  
+    ## global_sentiment_polarity                 7.385e-01  8.908e-01   0.829 0.407069    
+    ## title_sentiment_polarity                  1.355e-01  4.063e-02   3.336 0.000855 ***
+    ## self_reference_avg_sharess                9.910e-07  2.847e-07   3.481 0.000502 ***
+    ## rate_positive_words                       6.795e-01  5.254e-01   1.293 0.195986    
+    ## n_tokens_title:average_token_length       3.453e-02  1.348e-02   2.562 0.010440 *  
+    ## n_tokens_title:global_sentiment_polarity -1.250e-01  8.501e-02  -1.470 0.141604    
+    ## n_tokens_title:rate_positive_words       -7.850e-02  5.082e-02  -1.545 0.122449    
+    ## n_tokens_content:num_imgs                -6.259e-06  2.045e-06  -3.061 0.002217 ** 
+    ## num_imgs:num_keywords                     2.551e-03  8.316e-04   3.067 0.002169 ** 
+    ## num_imgs:global_subjectivity              1.964e-02  2.491e-02   0.788 0.430520    
+    ## num_imgs:global_sentiment_polarity       -1.130e-02  2.411e-02  -0.469 0.639200    
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
-    ## Residual standard error: 0.9206 on 2078 degrees of freedom
-    ## Multiple R-squared:  0.05576,    Adjusted R-squared:  0.04667 
-    ## F-statistic: 6.135 on 20 and 2078 DF,  p-value: 3.191e-16
+    ## Residual standard error: 0.7933 on 7325 degrees of freedom
+    ## Multiple R-squared:  0.04936,    Adjusted R-squared:  0.04676 
+    ## F-statistic: 19.02 on 20 and 7325 DF,  p-value: < 2.2e-16
 
 ## Random Forest Model
 
@@ -787,26 +792,26 @@ create a better fitting model is called boosting. It’s analogous to the
 proverb “None of us is as smart as all of us.”
 
 The first step in creating a boosted tree model is fitting a single
-decision tree with *d* splits to the data. We evaluate this fit using a
-loss function, a method of measuring prediction error. There are many
+decision tree with \(d\) splits to the data. We evaluate this fit using
+a loss function, a method of measuring prediction error. There are many
 different loss functions and its selection is arbitrary. Step 2 is to
-add a second decision tree (also with *d* splits) to the first such that
-it lowers the loss compared to the first tree alone:
+add a second decision tree (also with \(d\) splits) to the first such
+that it lowers the loss compared to the first tree alone:
 
-*B**o**o**s**t**e**d**E**n**s**e**m**b**l**e* = *F**i**r**s**t**T**r**e**e* + *λ* \* *S**e**c**o**n**d**T**r**e**e*
+\[Boosted Ensemble = First Tree + \lambda * Second Tree\]
 
-*L**o**s**s*(*B**o**o**s**t**e**d**E**n**s**e**m**b**l**e*) &lt; *L**o**s**s*(*F**i**r**s**t**T**r**e**e*)
+\[Loss(Boosted Ensemble) < Loss(First Tree)\]
 
-Here, *λ* is a shrinkage parameter which slows the fitting process. It’s
-sometimes called the learning rate. We repeat the second step *B* times
-to finish building the model. The tuning parameters *λ*, *d*, and *B*
-can be chosen using cross validation.
+Here, \(\lambda\) is a shrinkage parameter which slows the fitting
+process. It’s sometimes called the learning rate. We repeat the second
+step \(B\) times to finish building the model. The tuning parameters
+\(\lambda\), \(d\), and \(B\) can be chosen using cross validation.
 
 In the R code below which uses the `caret` package to build a boosted
-tree model, `n.trees` is *B*, `interaction.depth` is *d*, and
-`shrinkage` is *λ*. The additional tuning parameter `n.minobsinnode`
-allows for controlling the minimum number of observations within each
-tree node.
+tree model, `n.trees` is \(B\), `interaction.depth` is \(d\), and
+`shrinkage` is \(\lambda\). The additional tuning parameter
+`n.minobsinnode` allows for controlling the minimum number of
+observations within each tree node.
 
 ``` r
 control <- trainControl(method = "cv", number = 5)
@@ -854,11 +859,11 @@ knitr::kable(compareFitsLong)
 ```
 
 |                     |   RMSE | Rsquared |    MAE |
-|:--------------------|-------:|---------:|-------:|
-| Linear Model 1      | 0.9310 |   0.0532 | 0.7149 |
-| Linear Model 2      | 0.9333 |   0.0445 | 0.7146 |
-| Random Forest Model | 0.9291 |   0.0543 | 0.7123 |
-| Boosted Tree Model  | 0.9399 |   0.0362 | 0.7193 |
+| :------------------ | -----: | -------: | -----: |
+| Linear Model 1      | 0.7775 |   0.0776 | 0.5956 |
+| Linear Model 2      | 0.7863 |   0.0549 | 0.6012 |
+| Random Forest Model | 0.7592 |   0.1190 | 0.5829 |
+| Boosted Tree Model  | 0.7545 |   0.1300 | 0.5766 |
 
-Our final model is the Random Forest Model. When we fit the model on the
-test data we get RMSE=0.9291, Rsquared=0.0543, and MAE=0.7123.
+Our final model is the Boosted Tree Model. When we fit the model on the
+test data we get RMSE=0.7545, Rsquared=0.13, and MAE=0.5766.

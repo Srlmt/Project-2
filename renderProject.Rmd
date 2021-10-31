@@ -23,10 +23,12 @@ param = lapply(channels, FUN = function(x){list(channel = x)})
 reports <- tibble(output_file, param)
 
 apply(reports, MARGIN = 1, FUN = function(x){
+  # Assign variable to be used as title for each report
+  params = x[[2]]
+  
   rmarkdown::render(input = "Project-2.Rmd", 
                     output_format = "github_document", 
                     output_file = x[[1]],
-                    params = x[[2]],
                     output_options = list(
                       html_preview = FALSE,
                       toc = TRUE,

@@ -412,6 +412,7 @@ lm2Fit <- lm(log(shares) ~ . + n_tokens_title:average_token_length +
 summary(lm2Fit)
 ```
 
+
 ## Random Forest Model
 
 The random forest model is a classification algorithm that consists of many decision trees. It creates multiple (e.g. 500) bootstrapped samples and fit decision trees to each of the bootstrapped samples. When selecting a split point, the learning algorithm selects a random sample of predictors of which to search, instead of all the predictors. By not looking at all the predictors every time, it prevents one or two strong predictors to dominate the tree fits. The prediction of trees are then averaged (for regression) to get the final predicted value. This would lead to less variance and better fit over an individual tree fit.
